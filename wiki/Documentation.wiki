@@ -1,12 +1,4 @@
- _  _ |_  _  _  _ _ 
-(/_| || |(_|| |(_(/_
-
--------------------------------------------------------
-Enhance JavaScript library Documentation
-
-Enhance.js is a tiny JavaScript library that performs capabilities testing to determine 
-the level of experience a browser should receive. By using this library as prescribed, 
-you can rest assured that most any user will be able to access and use your website.
+Enhance.js is a JavaScript library that performs capabilities testing to determine the level of experience a browser should receive. By using this library as prescribed, you can rest assured that most any user will be able to access and use your website.
 
 
 =======================================================
