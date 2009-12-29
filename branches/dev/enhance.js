@@ -207,7 +207,6 @@ function appendToggleLinks() {
     if (checkCookie) {
         var a = doc.createElement('a');
         a.href = "#";
-        a.tabindex = 0;
         a.className = settings.testName + '_toggleResult';
         a.innerHTML = checkCookie === 'pass' ? settings.forceFailText : settings.forcePassText;
         a.onclick   = checkCookie === 'pass' ? enhance.forceFail : enhance.forcePass;
