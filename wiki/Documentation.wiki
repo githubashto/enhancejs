@@ -7,9 +7,9 @@ Usage:
 
 1. To use enhance.js, first attach the script to your page:
 	
-	<script type="text/javascript" src="enhance/enhance.js"></script>
+	<script type="text/javascript" src="enhance.js"></script>
 
-2. Then add a script element beneath that for code execution:
+2. Then add a script element beneath that for running EnhanceJS
 
 	<script type="text/javascript">
 		//custom javascript goes here.
@@ -107,7 +107,7 @@ tests
 		- resize: Tests for window resize support
 		- print: Tests for window print support
 
-log
+alertOnFailure
 	type: boolean
 	description: For development only. Alert failed test result. (uses alert() for wide compatibility)
 	default: false
