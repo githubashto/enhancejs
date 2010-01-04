@@ -127,7 +127,7 @@ enhance.defaultSettings = {
     tests: enhance.defaultTests,
     applyDocReadyHack: true,
     addTests: {},
-    log: false
+    alertOnFailure: false
 };
 
 function forceFail() {
@@ -164,7 +164,7 @@ function runTests() {
             for (var name in settings.tests) {
                 pass = settings.tests[name]();
                 if (!pass) {
-                    if (settings.log) {
+                    if (settings.alertOnFailure) {
                         alert(name + ' failed');
                     }
                     break;
