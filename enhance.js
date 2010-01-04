@@ -94,7 +94,7 @@ var enhance = function(settings){
 			}
 		},
 		addTests: {},
-		log: false
+		alertOnFailure: false
 	};
 	
 	//extend configuration with args
@@ -141,7 +141,7 @@ var enhance = function(settings){
 						if(testResult == 'pass'){
 							if(!testSuites[i][value]()){
 								testResult = 'fail';
-								if(settings.log){ alert(value +' = '+ testSuites[i][value]()); }
+								if(settings.alertOnFailure){ alert(value +' = '+ testSuites[i][value]()); }
 							}
 						}
 					}
