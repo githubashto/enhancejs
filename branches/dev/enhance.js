@@ -5,7 +5,7 @@
 */
 (function(win, doc) {
     
-var settings, body,
+var settings, body, windowLoaded,
     head = doc.getElementsByTagName('head')[0] || doc.documentElement;
 
 enhance = function(options) {
@@ -27,11 +27,9 @@ enhance = function(options) {
     
     applyDocReadyHack();
     
-    if (settings.appendToggleLink) {
-        windowLoad(function() { 
-            appendToggleLinks();
-        });
-    }
+    windowLoad(function() {
+        windowLoaded = true;
+    });
 };
 
 enhance.defaultTests = {
@@ -151,6 +149,13 @@ function runTests() {
         if (result === 'pass') {
             enhancePage();
         }
+        
+        // append toggle link
+        if (settings.appendToggleLink) {
+            windowLoad(function() { 
+                appendToggleLinks(result);
+            });
+        }
     }
     //no cookies - run tests
     else {
@@ -171,6 +176,13 @@ function runTests() {
             if (pass) {
                 enhancePage();
             }
+            
+            // append toggle link
+            if (settings.appendToggleLink) {
+                windowLoad(function() { 
+                    appendToggleLinks(result);
+                });
+            }
         });
     }
 }
@@ -187,24 +199,26 @@ function bodyOnReady(callback) {
 }
 
 function windowLoad(callback) {
-    var oldonload = win.onload
-    win.onload = function() {
-        if (oldonload) { oldonload(); }
+    if (windowLoaded) {
         callback();
+    } else {
+        var oldonload = win.onload
+        win.onload = function() {
+            if (oldonload) { oldonload(); }
+            callback();
+        }
     }
 }
 
-function appendToggleLinks() {
+function appendToggleLinks(result) {
     if (!settings.appendToggleLink) { return; }
-    
-    var checkCookie = readCookie(settings.testName);
         
-    if (checkCookie) {
+    if (result) {
         var a = doc.createElement('a');
         a.href = "#";
         a.className = settings.testName + '_toggleResult';
-        a.innerHTML = checkCookie === 'pass' ? settings.forceFailText : settings.forcePassText;
-        a.onclick   = checkCookie === 'pass' ? enhance.forceFail : enhance.forcePass;
+        a.innerHTML = result === 'pass' ? settings.forceFailText : settings.forcePassText;
+        a.onclick   = result === 'pass' ? enhance.forceFail : enhance.forcePass;
         doc.getElementsByTagName('body')[0].appendChild(a);
     }
 }
