@@ -60,27 +60,25 @@ enhance.defaultTests = {
         body.removeChild(newDiv);
         return divLeft === 10;
     },
-    'float': function() {
-        var newDiv = doc.createElement('div'),
-            style = 'style="width: 5px; float: left;"';
+    floatClear: function() {
+        var pass = false,
+            newDiv = doc.createElement('div'),
+            style = 'style="width: 5px; height: 5px; float: left;"';
         newDiv.innerHTML = '<div ' + style + '></div><div ' + style + '></div>';
         body.appendChild(newDiv);
         var childNodes = newDiv.childNodes,
-            divTopA = childNodes[0].offsetTop,
-            divTopB = childNodes[1].offsetTop;
+            topA = childNodes[0].offsetTop,
+            divB = childNodes[1],
+            topB = divB.offsetTop;
+        if (topA === topB) {
+            divB.style.clear = 'left';
+            topB = divB.offsetTop;
+            if (topA !== topB) {
+                pass = true;
+            }
+        }
         body.removeChild(newDiv);
-        return divTopA === divTopB;
-    },
-    clear: function() {
-        var newDiv = doc.createElement('div'),
-            style = 'width: 5px; height: 5px; float: left;';
-        newDiv.innerHTML = '<div style="' + style + '"></div><div style="' + style + ' clear: left;"></div>';
-        body.appendChild(newDiv);
-        var childNodes = newDiv.childNodes,
-            divTopA = childNodes[0].offsetTop,
-            divTopB = childNodes[1].offsetTop;
-        body.removeChild(newDiv);
-        return divTopA !== divTopB;
+        return pass;
     },
     overflow: function() {
         var newDiv = doc.createElement('div');
