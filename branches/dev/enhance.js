@@ -25,9 +25,7 @@ enhance = function(options) {
     
     runTests();
     
-    if (settings.applyDocReadyHack) {
-        applyDocReadyHack();
-    }
+    applyDocReadyHack();
     
     if (settings.appendToggleLink) {
         windowLoad(function() { 
@@ -125,7 +123,6 @@ enhance.defaultSettings = {
     forcePassText: 'View High-bandwidth version',
     forceFailText: 'View Low-bandwidth version',
     tests: enhance.defaultTests,
-    applyDocReadyHack: true,
     addTests: {},
     alertOnFailure: false
 };
