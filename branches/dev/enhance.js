@@ -232,7 +232,7 @@ function enhancePage() {
         appendStyles();
     }
     if (settings.loadScripts.length) {
-        settings.queueLoading ? appendScriptsSync() : appendScriptAsync();
+        settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
     }
 }
 
