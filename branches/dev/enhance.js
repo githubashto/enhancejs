@@ -252,15 +252,16 @@ function appendStyles() {
         }
         else {
             for (var attr in name) {
-                link.setAttribute(attr, name[attr]);
+                if (attr !== 'iecondition')
+                    link.setAttribute(attr, name[attr]);
             }
-            if (attr === 'iecondition' && (/MSIE (\d+)\.\d+;/).test(navigator.userAgent)) {
+            if (name['iecondition'] && (/MSIE (\d+)\.\d+;/).test(navigator.userAgent)) {
                 var ieversion = new Number(RegExp.$1);
-                if (name['iecondition'] === 'all' || name['iecondition'] === ieversion) {
+                if (name['iecondition'] === 'all' || name['iecondition'] == ieversion) {
                     head.appendChild(link); 
                 }
             }
-            else {
+            else if (!name['iecondition']) {
                 head.appendChild(link);
             }
         }
