@@ -120,7 +120,9 @@ enhance.defaultSettings = {
     forceFailText: 'View Low-bandwidth version',
     tests: enhance.defaultTests,
     addTests: {},
-    alertOnFailure: false
+    alertOnFailure: false,
+    onPass: function(){},
+    onFail: function(){}
 };
 
 function forceFail() {
@@ -148,6 +150,9 @@ function runTests() {
     if (result) {
         if (result === 'pass') {
             enhancePage();
+            settings.onPass();
+        } else {
+            settings.onFail();
         }
         
         // append toggle link
@@ -175,6 +180,9 @@ function runTests() {
             createCookie(settings.testName, result);
             if (pass) {
                 enhancePage();
+                settings.onPass();
+            } else {
+                settings.onFail();
             }
             
             // append toggle link
