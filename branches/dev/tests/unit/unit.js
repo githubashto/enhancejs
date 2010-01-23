@@ -7,7 +7,7 @@ testWithIframe('iframe test helper', function(win, doc, enhance) {
 });
 
 testWithIframe('pass and basics', function(win, doc, enhance) {
-    expect(6);
+    expect(7);
     
     enhance.defaultTests = {
         fail: function() {
@@ -30,7 +30,7 @@ testWithIframe('pass and basics', function(win, doc, enhance) {
                 return true;
             }
         },
-        loadScripts: ['../data/pass.js'],
+        loadScripts: ['../data/pass.js', '../data/onErrorTest-falseurl.js'],
         loadStyles: ['pass.css'],
         onPass: function() {
             start();
@@ -43,6 +43,9 @@ testWithIframe('pass and basics', function(win, doc, enhance) {
         onFail: function() {
             start();
             ok(false, 'onFail was called');
+        },
+        onLoadError: function() {
+            ok(true, 'onLoadError was called after script failed to load');
         }
     };
     
