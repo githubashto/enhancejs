@@ -122,7 +122,8 @@ enhance.defaultSettings = {
     addTests: {},
     alertOnFailure: false,
     onPass: function(){},
-    onFail: function(){}
+    onFail: function(){},
+    onLoadError: addErrorClass
 };
 
 function forceFail() {
@@ -244,6 +245,13 @@ function enhancePage() {
     }
 }
 
+function addErrorClass (){
+	var errorClass = settings.testName + '-incomplete';
+	if (doc.documentElement.className.indexOf(errorClass) === -1) {
+        doc.documentElement.className += ' ' + errorClass;
+    }
+}
+
 function appendStyles() {
     var index = -1,
         name;
@@ -253,6 +261,7 @@ function appendStyles() {
         
         link.type = 'text/css';
         link.rel  = 'stylesheet';
+        link.onerror = settings.onLoadError;
         
         if (typeof name === 'string') {
             link.href = name;
@@ -314,6 +323,7 @@ function createScriptTag(src) {
     var script  = doc.createElement('script');
     script.type = 'text/javascript';
     script.src  = src;
+    script.onerror = settings.onLoadError;
     return script;
 }
 
