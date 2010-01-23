@@ -123,7 +123,7 @@ enhance.defaultSettings = {
     alertOnFailure: false,
     onPass: function(){},
     onFail: function(){},
-    onLoadError: addErrorClass
+    onLoadError: addIncompleteClass
 };
 
 function forceFail() {
@@ -245,7 +245,7 @@ function enhancePage() {
     }
 }
 
-function addErrorClass (){
+function addIncompleteClass (){
 	var errorClass = settings.testName + '-incomplete';
 	if (doc.documentElement.className.indexOf(errorClass) === -1) {
         doc.documentElement.className += ' ' + errorClass;
