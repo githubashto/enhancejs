@@ -305,15 +305,19 @@ function appendScriptsSync() {
         var item    = queue.shift();
             script = createScriptTag(item),
             done   = false;
-        
-        script.onload = script.onreadystatechange = function() {
-            if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
-                done = true;
-                next();
-                this.onload = this.onreadystatechange = null;
-            }
+        if(script){
+	        script.onload = script.onreadystatechange = function() {
+	            if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
+	                done = true;
+	                next();
+	                this.onload = this.onreadystatechange = null;
+	            }
+	        }
+	        head.insertBefore(script, head.firstChild);
         }
-        head.insertBefore(script, head.firstChild);
+        else{
+        	next();
+        }
     }
     
     next();
@@ -324,16 +328,40 @@ function appendScriptsAsync() {
         item;
         
     while ((item = settings.loadScripts[++index])) {
-        head.insertBefore(createScriptTag(item), head.firstChild);
+    	var script = createScriptTag(item);
+        if(script){
+        	head.insertBefore(script, head.firstChild);
+        }	
     }
 }
 
 function createScriptTag(item) {
     var script  = doc.createElement('script');
     script.type = 'text/javascript';
-    script.src  = item;
     script.onerror = settings.onLoadError;
-    return script;
+    
+    if (typeof item === 'string') {
+        script.src  = item;
+        return script;
+    }
+    else {
+        for (var attr in item) {
+            if (attr !== 'iecondition') {
+                script.setAttribute(attr, item[attr]);
+            }    
+        }
+        if (item['iecondition'] && isIE()) {
+            if (isIE(item['iecondition'])) {
+                return script;
+            }
+        }
+        else if (!item['iecondition']) {
+            return script;
+        }
+        else{
+        	return false;
+        }
+    }
 }
 
 /*cookie functions from quirksmode.org*/
