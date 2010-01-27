@@ -4,9 +4,10 @@
  * Dual licensed under the MIT (filamentgroup.com/examples/mit-license.txt) and GPL (filamentgroup.com/examples/gpl-license.txt) licenses.
 */
 (function(win, doc) {
-    
-var settings, body, windowLoaded,
-    head = doc.getElementsByTagName('head')[0] || doc.documentElement;
+var settings, body, windowLoaded, head;
+	
+if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || doc.documentElement; }
+else{ head = doc.documentElement; }
 
 enhance = function(options) {
     options  = options || {};
