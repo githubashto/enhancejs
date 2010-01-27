@@ -269,12 +269,12 @@ function appendStyles() {
         }
         else {
             for (var attr in name) {
-                if (attr !== 'iecondition')
+                if (attr !== 'iecondition') {
                     link.setAttribute(attr, name[attr]);
+                }    
             }
-            if (name['iecondition'] && (/MSIE (\d+)\.\d+;/).test(navigator.userAgent)) {
-                var ieversion = new Number(RegExp.$1);
-                if (name['iecondition'] === 'all' || name['iecondition'] == ieversion) {
+            if (name['iecondition'] && isIE()) {
+                if (isIE(name['iecondition'])) {
                     head.appendChild(link); 
                 }
             }
@@ -283,6 +283,15 @@ function appendStyles() {
             }
         }
     }
+}
+
+function isIE(version) {
+	var isIE = (/MSIE (\d+)\.\d+;/).test(navigator.userAgent);
+	var ieVersion = new Number(RegExp.$1);
+	if(isIE && version){
+		if (version === 'all' || version == ieVersion) { return true; }
+	}
+	else{ return isIE; }
 }
 
 function appendScriptsSync() {
