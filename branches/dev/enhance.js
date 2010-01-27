@@ -254,31 +254,31 @@ function addIncompleteClass (){
 
 function appendStyles() {
     var index = -1,
-        name;
+        item;
     
-    while ((name = settings.loadStyles[++index])) {
+    while ((item = settings.loadStyles[++index])) {
         var link  = doc.createElement('link');
         
         link.type = 'text/css';
         link.rel  = 'stylesheet';
         link.onerror = settings.onLoadError;
         
-        if (typeof name === 'string') {
-            link.href = name;
+        if (typeof item === 'string') {
+            link.href = item;
             head.appendChild(link);
         }
         else {
-            for (var attr in name) {
+            for (var attr in item) {
                 if (attr !== 'iecondition') {
-                    link.setAttribute(attr, name[attr]);
+                    link.setAttribute(attr, item[attr]);
                 }    
             }
-            if (name['iecondition'] && isIE()) {
-                if (isIE(name['iecondition'])) {
+            if (item['iecondition'] && isIE()) {
+                if (isIE(item['iecondition'])) {
                     head.appendChild(link); 
                 }
             }
-            else if (!name['iecondition']) {
+            else if (!item['iecondition']) {
                 head.appendChild(link);
             }
         }
@@ -302,8 +302,8 @@ function appendScriptsSync() {
             return;
         }
         
-        var src    = queue.shift();
-            script = createScriptTag(src),
+        var item    = queue.shift();
+            script = createScriptTag(item),
             done   = false;
         
         script.onload = script.onreadystatechange = function() {
@@ -321,17 +321,17 @@ function appendScriptsSync() {
 
 function appendScriptsAsync() {
     var index = -1,
-        name;
+        item;
         
-    while ((name = settings.loadScripts[++index])) {
-        head.insertBefore(createScriptTag(name), head.firstChild);
+    while ((item = settings.loadScripts[++index])) {
+        head.insertBefore(createScriptTag(item), head.firstChild);
     }
 }
 
-function createScriptTag(src) {
+function createScriptTag(item) {
     var script  = doc.createElement('script');
     script.type = 'text/javascript';
-    script.src  = src;
+    script.src  = item;
     script.onerror = settings.onLoadError;
     return script;
 }
