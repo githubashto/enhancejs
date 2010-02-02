@@ -79,14 +79,6 @@ enhance.defaultTests = {
         body.removeChild(newDiv);
         return pass;
     },
-    lineheight: function(){ 
-		var newDiv = doc.createElement('div');
-		newDiv.innerHTML = '<div style="line-height: 2; font-size: 10px;">Te<br />st</div>';
-		body.appendChild(newDiv);
-		var divHeight = newDiv.offsetHeight;
-		body.removeChild(newDiv);
-		return divHeight === 40;
-	},
     overflow: function() {
         var newDiv = doc.createElement('div');
         newDiv.innerHTML = '<div style="height: 10px; overflow: hidden;"></div>';
