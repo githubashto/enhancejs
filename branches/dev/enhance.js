@@ -127,23 +127,33 @@ enhance.defaultSettings = {
     onLoadError: addIncompleteClass
 };
 
+function cookiesSupported(){
+	var testCookie = 'enhancejs-cookietest';
+	createCookie(testCookie, 'enabled');
+	var result = readCookie(testCookie);
+	eraseCookie(testCookie);
+	return result === 'enabled';
+}
+enhance.cookiesSupported = cookiesSupported();
+
 function forceFail() {
     createCookie(settings.testName, 'fail');
     win.location.reload();
 }
-enhance.forceFail = forceFail;
+if(enhance.cookiesSupported){ enhance.forceFail = forceFail; }
+
 
 function forcePass() {
     createCookie(settings.testName, 'pass');
     win.location.reload();
 }
-enhance.forcePass = forcePass;
+if(enhance.cookiesSupported){ enhance.forcePass = forcePass; }
 
 function reTest() {
     eraseCookie(settings.testName);
     win.location.reload();
 }
-enhance.reTest = reTest;
+if(enhance.cookiesSupported){ enhance.reTest = reTest; }
 
 function runTests() {
     var result = readCookie(settings.testName);
@@ -221,7 +231,7 @@ function windowLoad(callback) {
 }
 
 function appendToggleLinks(result) {
-    if (!settings.appendToggleLink) { return; }
+    if (!settings.appendToggleLink || !enhance.cookiesSupported) { return; }
         
     if (result) {
         var a = doc.createElement('a');
