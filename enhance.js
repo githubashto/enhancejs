@@ -393,14 +393,14 @@ function readCookie(name) {
         var c = ca[i];
         while (c.charAt(0)==' ') c = c.substring(1,c.length);
         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-			}
+    }
     return null;
 }
-	
+
 function eraseCookie(name) {
     createCookie(name,"",-1);
 }
-							
+
 
 function applyDocReadyHack() {
     // via http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
@@ -419,8 +419,8 @@ function applyDocReadyHack() {
         // set readyState = loading or interactive
         // it does not really matter for this purpose
         doc.readyState = "loading";
-			}
+    }
 }
-		
-		
+
+
 })(window, document);
