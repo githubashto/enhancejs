@@ -1,307 +1,426 @@
 /*
  * enhance.js - Test-Driven Progressive Enhancement
- * Authored by Scott Jehl, Filament Group (filamentgroup.com)
+ * Authors: Scott Jehl (filamentgroup.com), Brandon Aaron (brandonaaron.net)
  * Dual licensed under the MIT (filamentgroup.com/examples/mit-license.txt) and GPL (filamentgroup.com/examples/gpl-license.txt) licenses.
- * Version 1.0
 */
+(function(win, doc) {
+var settings, body, windowLoaded, head;
+	
+if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || doc.documentElement; }
+else{ head = doc.documentElement; }
 
-var enhance = function(settings){
-	var that = this;
-	that.settings = {
-		testName: 'enhanced',
-		loadScripts: [],
-		loadStyles: [],
-		queueLoading: true,
-		appendToggleLink: true,
-		forcePassText: 'View High-bandwidth version',
-		forceFailText: 'View Low-bandwidth version',
-		tests: {
-			getById: function(){
-				return document.getElementById ? true : false;
-			},
-			getByTagName: function(){
-				return document.getElementsByTagName ? true : false;
-			},
-			createEl: function(){
-				return document.createElement ? true : false;
-			},
-			boxmodel: function(){
-				var newDiv = document.createElement('div');
-				document.body.appendChild(newDiv);
-				newDiv.style.width = '1px';
-				newDiv.style.padding = '1px';
-				var divWidth = newDiv.offsetWidth;
-				document.body.removeChild(newDiv);
-				return divWidth == 3;
-			},
-			position: function(){
-				var newDiv = document.createElement('div');
-				document.body.appendChild(newDiv);
-				newDiv.style.position = 'absolute';
-				newDiv.style.left = '10px';
-				var divLeft = newDiv.offsetLeft;
-				document.body.removeChild(newDiv);
-				return divLeft == 10;
-			},
-			float: function(){
-				var newDiv = document.createElement('div');
-				document.body.appendChild(newDiv);
-				newDiv.innerHTML = '<div style="width: 5px; float: left;"></div><div style="width: 5px; float: left;"></div>';
-				var divTopA = newDiv.childNodes[0].offsetTop;
-				var divTopB = newDiv.childNodes[1].offsetTop;
-				document.body.removeChild(newDiv);
-				return divTopA == divTopB;
-			},
-			clear: function(){
-				var newDiv = document.createElement('div');
-				document.body.appendChild(newDiv);
-				newDiv.style.visibility = 'hidden';
-				newDiv.innerHTML = '<ul><li style="width: 1px; float: left;">test</li><li style="width: 1px; float: left;clear: left;">test</li></ul>';
-				var liTopA = newDiv.getElementsByTagName('li')[0].offsetTop;
-				var liTopB = newDiv.getElementsByTagName('li')[1].offsetTop;
-				document.body.removeChild(newDiv);
-				return liTopA != liTopB;
-			},
-			overflow: function(){
-				var newDiv = document.createElement('div');
-				document.body.appendChild(newDiv);
-				newDiv.innerHTML = '<div style="height: 10px; overflow: hidden;"></div>';
-				var divHeight = newDiv.offsetHeight;
-				document.body.removeChild(newDiv);
-				return divHeight == 10;
-			},
-			ajax: function(){
-				//factory test borrowed from quirksmode.org
-				var XMLHttpFactories = [
-					function () {return new XMLHttpRequest()},
-					function () {return new ActiveXObject("Msxml2.XMLHTTP")},
-					function () {return new ActiveXObject("Msxml3.XMLHTTP")},
-					function () {return new ActiveXObject("Microsoft.XMLHTTP")}
-				];
-				var xmlhttp = false;
-				for (var k=0;k<XMLHttpFactories.length;k++) {
-					try {xmlhttp = XMLHttpFactories[k]();}
-					catch (e) {continue;}
-					break;
-				}
-				return xmlhttp ? true : false;
-			},
-			resize: function(){
-				return (window.onresize == false) ? false : true
-			},
-			print: function(){
-				return window.print ? true : false
-			}
-		},
-		addTests: {},
-		alertOnFailure: false
-	};
-	
-	//extend configuration with args
-	if(typeof(settings) == 'object'){
-		for(var value in settings){ that.settings[value] = settings[value]; }
-	};
-	
-	//public methods - can be used for custom pass/fail toggles
-	that.forceFail = function(){
-		that._eraseCookie(that.settings.testName);
-		that._createCookie(that.settings.testName, 'fail');
-		window.location.reload();
-		return false;
-	};
-	that.forcePass = function(){
-		that._eraseCookie(that.settings.testName);
-		that._createCookie(that.settings.testName, 'pass');
-		window.location.reload();
-		return false;
-	};
-	that.reTest = function(){
-		that._eraseCookie(that.settings.testName);
-		window.location.reload();
-		return false;
-	};
-	
-	//private - check cookies or run tests
-	that._runtests = function(){
-		var settings = that.settings;
-		var cookieGrade = that._readCookie(settings.testName);
-		var testResult = 'pass'; //innocent until proven...
-		//check for cookies from a previous test
-		if(cookieGrade){
-			testResult = cookieGrade;
-			if(cookieGrade == 'pass'){ that._enhancePage(); }	
-			that.windowLoad(function(){ that._appendToggleLinks(testResult); });
-		}
-		//no cookies - run tests
-		else {
-			that._bodyOnReady(function(){
-				var testSuites = [settings.tests, settings.addTests];
-				for(var i in testSuites){
-					for(var value in testSuites[i]){
-						if(testResult == 'pass'){
-							if(!testSuites[i][value]()){
-								testResult = 'fail';
-								if(settings.alertOnFailure){ alert(value +' = '+ testSuites[i][value]()); }
-							}
-						}
-					}
-				}
-				//set cookie for future page loads
-				that._createCookie(settings.testName, testResult);
-				//append toglle links
-				that.windowLoad(function(){ that._appendToggleLinks(testResult); });
-				//enhance the page based on test results
-				if(testResult == 'pass'){ that._enhancePage(); }
-				//test is done, return capabilities object
-			});
-		}
-	};
-	
-	that._bodyOnReady = function(callback){
-		function bodyReady(){
-			if(document.body){
-				that._bodyReady = true;
-				clearInterval(checkBody); //body is ready, stop asking
-				callback();
-			}
-		}
-		var checkBody = setInterval(bodyReady, 1);
-	};
-	
-	that.windowLoad = function(callback){
-		var oldonload = window.onload;
-		if (typeof window.onload != 'function') {
-			window.onload = callback;
-		}
-		else {
-			window.onload = function() {
-				oldonload();
-				callback();
-			}
-		}
-	}
-	
-	//append forceFail/forcePass links
-	that._appendToggleLinks = function(testResult){
-		var settings = that.settings;
-		var checkCookie = that._readCookie(settings.testName);
-		if(checkCookie == "pass" || checkCookie == "fail"){
-			if(settings.appendToggleLink){
-				var a = document.createElement('a');
-				a.href = "#";
-				a.setAttribute('tabindex', 0);
-				a.className = settings.testName + '_toggleResult';
-				if(testResult == 'pass'){
-					a.innerHTML = settings.forceFailText;
-					a.onclick = that.forceFail;
-				}
-				else{
-					a.innerHTML = settings.forcePassText;
-					a.onclick = that.forcePass;
-				}
-				document.getElementsByTagName('body')[0].appendChild(a);
-			}
-		}
-	};
-	
-	
-	//private - test passed, make enhancements
-	that._enhancePage = function(){
-		var settings = that.settings;
-		//add documentElement class				
-		if (document.documentElement.className.indexOf(settings.testName) <= -1){
-			document.documentElement.className += ' '+ settings.testName;
-		}
-		//append styles
-		var h = document.getElementsByTagName("head")[0] || document.documentElement, done = false;
-		//first styles
-		if(settings.loadStyles.length>0){
-			for(var name in settings.loadStyles){
-				var s = document.createElement('link');
-				s.setAttribute('type', 'text/css');
-				s.setAttribute('rel', 'stylesheet');
-				if(typeof(settings.loadStyles[name]) == 'object'){
-					for(var attr in settings.loadStyles[name]){
-						s.setAttribute(attr, settings.loadStyles[name][attr]);
-					}
-				}
-				else {
-					s.setAttribute('href', settings.loadStyles[name]);
-				}				
-				//if there's an ie condition specified...
-				if(typeof(settings.loadStyles[name]) == 'object' && settings.loadStyles[name]['iecondition']){
-					if( /MSIE (\d+)\.\d+;/.test(navigator.userAgent) ){
-						var ieversion = new Number(RegExp.$1);
-						if(settings.loadStyles[name]['iecondition'] == 'all' || settings.loadStyles[name]['iecondition'] == ieversion){
-							h.appendChild(s); 
-						}
-					}	
-				}	
-				//otherwise, inject
-				else{
-					h.appendChild(s); 
-				}
-			}	
-		}
-		//append scripts
-		if(settings.loadScripts.length>0){
-			var jsQueue = (settings.queueLoading) ? [] : null;
-			for(var name in settings.loadScripts){
-				var s = document.createElement('script');
-				s.setAttribute('src', settings.loadScripts[name]);
-				s.setAttribute('type', 'text/javascript');
-				if(jsQueue == null){ h.appendChild(s); }
-				else{ jsQueue[name] = s; }				
-			}
-			//if queue 
-			var i = 0;
-			//script and style queue
-			function loadFromQueue(){
-				if(jsQueue[i]){
-					done = false;				
-					jsQueue[i].onreadystatechange = jsQueue[i].onload = function() {
-						if (!done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete") ) {
-							done = true;
-							loadFromQueue();
-							// Handle memory leak in IE
-							this.onload = this.onreadystatechange = null;
-							h.removeChild( this );
-							
-						}
-					}	
-
-					h.insertBefore( jsQueue[i], h.firstChild );
-					i++;
-				}	
-			}
-			if(jsQueue!=null){ loadFromQueue(); }
-		}
-	};	
-		
-	/*cookie functions from quirksmode.org*/
-	that._createCookie = function(name,value,days) {
-		if (days) {
-			var date = new Date();
-			date.setTime(date.getTime()+(days*24*60*60*1000));
-			var expires = "; expires="+date.toGMTString();
-		}
-		else var expires = "";
-		document.cookie = name+"="+value+expires+"; path=/";
-	};
-	that._readCookie = function(name) {
-		var nameEQ = name + "=";
-		var ca = document.cookie.split(';');
-		for(var i=0;i < ca.length;i++) {
-			var c = ca[i];
-			while (c.charAt(0)==' ') c = c.substring(1,c.length);
-			if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-		}
-		return null;
-	};
-	that._eraseCookie = function(name) {
-		that._createCookie(name,"",-1);
-	};
-		
-	that._runtests();
-	return that;
+enhance = function(options) {
+    options  = options || {};
+    settings = {};
+    
+    // mixin settings
+    for (var name in enhance.defaultSettings) {
+        var option = options[name];
+        settings[name] = option !== undefined ? option : enhance.defaultSettings[name];
+    }
+    
+    // mixin additional tests
+    for (var test in options.addTests) {
+        settings.tests[test] = options.addTests[test];
+    }
+    
+    runTests();
+    
+    applyDocReadyHack();
+    
+    windowLoad(function() {
+        windowLoaded = true;
+    });
 };
+
+enhance.defaultTests = {
+    getById: function() {
+        return !!doc.getElementById;
+    },
+    getByTagName: function() {
+        return !!doc.getElementsByTagName;
+    },
+    createEl: function() {
+        return !!doc.createElement;
+    },
+    boxmodel: function() {
+        var newDiv = doc.createElement('div');
+        newDiv.style.cssText = 'width: 1px; padding: 1px;';
+        body.appendChild(newDiv);
+        var divWidth = newDiv.offsetWidth;
+        body.removeChild(newDiv);
+        return divWidth === 3;
+    },
+    position: function() {
+        var newDiv = doc.createElement('div');
+        newDiv.style.cssText = 'position: absolute; left: 10px;';
+        body.appendChild(newDiv);
+        var divLeft = newDiv.offsetLeft;
+        body.removeChild(newDiv);
+        return divLeft === 10;
+    },
+    floatClear: function() {
+        var pass = false,
+            newDiv = doc.createElement('div'),
+            style = 'style="width: 5px; height: 5px; float: left;"';
+        newDiv.innerHTML = '<div ' + style + '></div><div ' + style + '></div>';
+        body.appendChild(newDiv);
+        var childNodes = newDiv.childNodes,
+            topA = childNodes[0].offsetTop,
+            divB = childNodes[1],
+            topB = divB.offsetTop;
+        if (topA === topB) {
+            divB.style.clear = 'left';
+            topB = divB.offsetTop;
+            if (topA !== topB) {
+                pass = true;
+            }
+        }
+        body.removeChild(newDiv);
+        return pass;
+    },
+    overflow: function() {
+        var newDiv = doc.createElement('div');
+        newDiv.innerHTML = '<div style="height: 10px; overflow: hidden;"></div>';
+        body.appendChild(newDiv);
+        var divHeight = newDiv.offsetHeight;
+        body.removeChild(newDiv);
+        return divHeight === 10;
+    },
+    ajax: function() {
+        //factory test borrowed from quirksmode.org
+        var xmlhttp = false, index = -1, factory,
+            XMLHttpFactories = [
+                function() { return new XMLHttpRequest() },
+                function() { return new ActiveXObject("Msxml2.XMLHTTP") },
+                function() { return new ActiveXObject("Msxml3.XMLHTTP") },
+                function() { return new ActiveXObject("Microsoft.XMLHTTP") }
+            ];
+        while ((factory = XMLHttpFactories[++index])) {
+            try { xmlhttp = factory(); }
+            catch (e) { continue; }
+            break;
+        }
+        return !!xmlhttp;
+    },
+    resize: function() {
+        return win.onresize != false;
+    },
+    print: function() {
+        return !!win.print;
+    }
+};
+
+enhance.defaultSettings = {
+    testName: 'enhanced',
+    loadScripts: [],
+    loadStyles: [],
+    queueLoading: true,
+    appendToggleLink: true,
+    forcePassText: 'View high-bandwidth version',
+    forceFailText: 'View low-bandwidth version',
+    tests: enhance.defaultTests,
+    addTests: {},
+    alertOnFailure: false,
+    onPass: function(){},
+    onFail: function(){},
+    onLoadError: addIncompleteClass
+};
+
+function cookiesSupported(){
+	var testCookie = 'enhancejs-cookietest';
+	createCookie(testCookie, 'enabled');
+	var result = readCookie(testCookie);
+	eraseCookie(testCookie);
+	return result === 'enabled';
+}
+enhance.cookiesSupported = cookiesSupported();
+
+function forceFail() {
+    createCookie(settings.testName, 'fail');
+    win.location.reload();
+}
+if(enhance.cookiesSupported){ enhance.forceFail = forceFail; }
+
+
+function forcePass() {
+    createCookie(settings.testName, 'pass');
+    win.location.reload();
+}
+if(enhance.cookiesSupported){ enhance.forcePass = forcePass; }
+
+function reTest() {
+    eraseCookie(settings.testName);
+    win.location.reload();
+}
+if(enhance.cookiesSupported){ enhance.reTest = reTest; }
+
+function runTests() {
+    var result = readCookie(settings.testName);
+        
+    //check for cookies from a previous test
+    if (result) {
+        if (result === 'pass') {
+            enhancePage();
+            settings.onPass();
+        } else {
+            settings.onFail();
+        }
+        
+        // append toggle link
+        if (settings.appendToggleLink) {
+            windowLoad(function() { 
+                appendToggleLinks(result);
+            });
+        }
+    }
+    //no cookies - run tests
+    else {
+        bodyOnReady(function() {
+            var pass = true;
+            for (var name in settings.tests) {
+                pass = settings.tests[name]();
+                if (!pass) {
+                    if (settings.alertOnFailure) {
+                        alert(name + ' failed');
+                    }
+                    break;
+                }
+            }
+            
+            result = pass ? 'pass' : 'fail';
+            createCookie(settings.testName, result);
+            if (pass) {
+                enhancePage();
+                settings.onPass();
+            } else {
+                settings.onFail();
+            }
+            
+            // append toggle link
+            if (settings.appendToggleLink) {
+                windowLoad(function() { 
+                    appendToggleLinks(result);
+                });
+            }
+        });
+    }
+}
+
+function bodyOnReady(callback) {
+    var checkBody = setInterval(bodyReady, 1);
+    function bodyReady() {
+        if (doc.body) {
+            body = doc.body;
+            clearInterval(checkBody);
+            callback();
+        }
+    }
+}
+
+function windowLoad(callback) {
+    if (windowLoaded) {
+        callback();
+    } else {
+        var oldonload = win.onload
+        win.onload = function() {
+            if (oldonload) { oldonload(); }
+            callback();
+        }
+    }
+}
+
+function appendToggleLinks(result) {
+    if (!settings.appendToggleLink || !enhance.cookiesSupported) { return; }
+        
+    if (result) {
+        var a = doc.createElement('a');
+        a.href = "#";
+        a.className = settings.testName + '_toggleResult';
+        a.innerHTML = result === 'pass' ? settings.forceFailText : settings.forcePassText;
+        a.onclick   = result === 'pass' ? enhance.forceFail : enhance.forcePass;
+        doc.getElementsByTagName('body')[0].appendChild(a);
+    }
+}
+
+function enhancePage() {
+    if (doc.documentElement.className.indexOf(settings.testName) === -1) {
+        doc.documentElement.className += ' ' + settings.testName;
+    }
+    
+    if (settings.loadStyles.length) {
+        appendStyles();
+    }
+    if (settings.loadScripts.length) {
+        settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
+    }
+}
+
+function addIncompleteClass (){
+	var errorClass = settings.testName + '-incomplete';
+	if (doc.documentElement.className.indexOf(errorClass) === -1) {
+        doc.documentElement.className += ' ' + errorClass;
+    }
+}
+
+function appendStyles() {
+    var index = -1,
+        item;
+    
+    while ((item = settings.loadStyles[++index])) {
+        var link  = doc.createElement('link');
+        
+        link.type = 'text/css';
+        link.rel  = 'stylesheet';
+        link.onerror = settings.onLoadError;
+        
+        if (typeof item === 'string') {
+            link.href = item;
+            head.appendChild(link);
+        }
+        else {
+            for (var attr in item) {
+                if (attr !== 'iecondition') {
+                    link.setAttribute(attr, item[attr]);
+                }    
+            }
+            if (item['iecondition'] && isIE()) {
+                if (isIE(item['iecondition'])) {
+                    head.appendChild(link); 
+                }
+            }
+            else if (!item['iecondition']) {
+                head.appendChild(link);
+            }
+        }
+    }
+}
+
+function isIE(version) {
+	var isIE = (/MSIE (\d+)\.\d+;/).test(navigator.userAgent);
+	var ieVersion = new Number(RegExp.$1);
+	if(isIE && version){
+		if (version === 'all' || version == ieVersion) { return true; }
+	}
+	else{ return isIE; }
+}
+
+function appendScriptsSync() {
+    var queue = [].concat(settings.loadScripts);
+    
+    function next() {
+        if (queue.length === 0) {
+            return;
+        }
+        
+        var item    = queue.shift();
+            script = createScriptTag(item),
+            done   = false;
+        if(script){
+	        script.onload = script.onreadystatechange = function() {
+	            if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
+	                done = true;
+	                next();
+	                this.onload = this.onreadystatechange = null;
+	            }
+	        }
+	        head.insertBefore(script, head.firstChild);
+        }
+        else{
+        	next();
+        }
+    }
+    
+    next();
+}
+
+function appendScriptsAsync() {
+    var index = -1,
+        item;
+        
+    while ((item = settings.loadScripts[++index])) {
+    	var script = createScriptTag(item);
+        if(script){
+        	head.insertBefore(script, head.firstChild);
+        }	
+    }
+}
+
+function createScriptTag(item) {
+    var script  = doc.createElement('script');
+    script.type = 'text/javascript';
+    script.onerror = settings.onLoadError;
+    
+    if (typeof item === 'string') {
+        script.src  = item;
+        return script;
+    }
+    else {
+        for (var attr in item) {
+            if (attr !== 'iecondition') {
+                script.setAttribute(attr, item[attr]);
+            }    
+        }
+        if (item['iecondition'] && isIE()) {
+            if (isIE(item['iecondition'])) {
+                return script;
+            }
+        }
+        else if (!item['iecondition']) {
+            return script;
+        }
+        else{
+        	return false;
+        }
+    }
+}
+
+/*cookie functions from quirksmode.org*/
+function createCookie(name, value, days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        var expires = "; expires="+date.toGMTString();
+    }
+    else var expires = "";
+    doc.cookie = name+"="+value+expires+"; path=/";
+}
+
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = doc.cookie.split(';');
+    for (var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+			}
+    return null;
+}
+	
+function eraseCookie(name) {
+    createCookie(name,"",-1);
+}
+							
+
+function applyDocReadyHack() {
+    // via http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
+    // verify that document.readyState is undefined
+    // verify that document.addEventListener is there
+    // these two conditions are basically telling us
+    // we are using Firefox < 3.6
+    if (doc.readyState == null && doc.addEventListener){
+        // on DOMContentLoaded event, supported since ages
+        doc.addEventListener("DOMContentLoaded", function DOMContentLoaded(){
+            // remove the listener itself
+            doc.removeEventListener("DOMContentLoaded", DOMContentLoaded, false);
+            // assign readyState as complete
+            doc.readyState = "complete";
+        }, false);
+        // set readyState = loading or interactive
+        // it does not really matter for this purpose
+        doc.readyState = "loading";
+			}
+}
+		
+		
+})(window, document);
