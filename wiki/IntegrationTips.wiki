@@ -1,0 +1,43 @@
+
+	
+
+=Integration Tips=
+
+==Dynamic CSS/JS loading==
+We highly recommend setting up your page to link only the necessary CSS and JS files for your basic experience
+and then specifying further files to load via enhance options. The difference between basic and enhanced 
+versions can be several hundred kb on the average website, so there's a lot of benefits to making this separation. 
+
+
+
+==Preventing FOUC==
+When using enhance.js, you might experience what's known as a Flash of Unstyled Content, or "FOUC." This side effect occurs whenever CSS is loaded and applied after a page begins visually rendering, causing a flash or jump between unstyled and styled content. This can be prevented in a number of ways. You can make the FOUC less of a problem by hiding the body content in your basic stylesheet, and then showing it with styles delivered in your enhanced stylesheet. The safe way to do this is to key your styles off of the html element with the test class applied. Like this:
+
+basic.css:
+{{{
+	html.enhanced body { visibility: hidden; }
+	html.enhanced-incomplete body { visibility: visible; }
+}}}
+at the end of enhanced.css (or your final enhanced css file):	
+{{{
+	html.enhanced body { visibility: visible; }
+}}}
+
+Since the class name (which varies depending on your testName option) is applied immediately upon passing the test, this will allow your page to just be blank until all styles are loaded. The second rule in basic.css above will make sure the page is visible if any stylesheets fail to load.
+
+
+
+
+==Styling the Toggle link==
+By default, enhance.js will append a link to the body element which allows a user to force a pass or fail
+result and refresh. This is useful for situations when something went wrong in the enhanced version of your 
+application, rendering it unusable, or even for mobile users who simply prefer a faster site. We recommend
+styling this link very simply in the basic version, and using the enhanced scripts and styles to change
+its style and positioning if preferable. Using our default testName of "enhanced", the link can be styled
+like this:
+{{{
+a.enhanced_toggleResult {... css goes here... }
+}}}
+Note that this class name will change based on your testName. Refer to the documentation above.
+
+
