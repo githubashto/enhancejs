@@ -1,5 +1,4 @@
-
-	
+#summary Tips and tricks for making EnhanceJS run smoothly.
 
 =Integration Tips=
 
@@ -39,5 +38,3 @@ like this:
 a.enhanced_toggleResult {... css goes here... }
 }}}
 Note that this class name will change based on your testName. Refer to the documentation above.
-
-
