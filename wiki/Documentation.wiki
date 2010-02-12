@@ -1,6 +1,3 @@
-Enhance.js is a JavaScript library that performs capabilities testing to determine the level of experience a browser should receive. By using this library as prescribed, you can rest assured that most any user will be able to access and use your website.
-
-
 =Basic Usage=
 
 1. To use enhance.js, first attach the script to your page:
@@ -48,75 +45,70 @@ or with real options:
 The following options are available for configuration:
 
 ===testName===
-	type: string
-	description: If test passes, this string is added as a class to the html element, which is helpful for CSS scoping.
-		It is also used as the name of the cookie which saves the test result for subsequent page loads.
-	default: 'enhanced'
+  * type: string
+  * description: If test passes, this string is added as a class to the html element, which is helpful for CSS scoping. It is also used as the name of the cookie which saves the test result for subsequent page loads.
+  * default: 'enhanced'
 	
 ===loadScripts===
-	type: array of strings
-	description: JavaScript file urls to load. 
-	default: []
+  * type: array of strings
+  * description: JavaScript file urls to load. 
+  * default: []
 	
 ===loadStyles===
-	type: array of strings or objects
-	description: CSS file urls to load. Each array item can also be an object with attribute/value pairs, for setting attributes on the link element such as media types. 
-			Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. 
-			Accepted values are either "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
-	default: []
+  * type: array of strings or objects
+  * description: CSS file urls to load. Each array item can also be an object with attribute/value pairs, for setting attributes on the link element such as media types. Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. Accepted values are either "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
+  * default: []
 
 ===queueLoading===
-	type: boolean
-	description: If true, JavaScript files in the loadScripts array are loaded consecutively to safeguard dependencies
-	default: true
+  * type: boolean
+  * description: If true, JavaScript files in the loadScripts array are loaded consecutively to safeguard dependencies
+  * default: true
 	
 ===appendToggleLink===
-	type: boolean
-	description: If true, an HTML link is appended to the body element allowing a user to force-pass or force-fail the test.
-		The link will have a class name of your testName value, plus '_toggleResult' (default: "enhanced_toggleResult")
-	default: true	
+  * type: boolean
+  * description: If true, an HTML link is appended to the body element allowing a user to force-pass or force-fail the test. The link will have a class name of your testName value, plus '_toggleResult' (default: "enhanced_toggleResult")
+  * default: true	
 	
 ===forcePassText===
-	type: string
-	description: Text for the appendToggleLink, if the link's behavior is to force-pass the test.
-	default: 'View High-bandwidth version'
+  * type: string
+  * description: Text for the appendToggleLink, if the link's behavior is to force-pass the test.
+  * default: 'View High-bandwidth version'
 	
 ===forceFailText===
-	type: string
-	description: Text for the appendToggleLink, if the link's behavior is to force-fail the test.
-	default: 'View Low-bandwidth version'	
+  * type: string
+  * description: Text for the appendToggleLink, if the link's behavior is to force-fail the test.
+  * default: 'View Low-bandwidth version'	
 
 ===onPass===
-	default: empty function
+  * default: empty function
 
 ===onFail===
-	default: empty function
+  * default: empty function
 
 ===onLoadError===
-	type: function
-	description: If a script or stylesheet fails to load.
-	default: function that adds a class of 'enhanced-incomplete' to the HTML element
+  * type: function
+  * description: If a script or stylesheet fails to load.
+  * default: function that adds a class of 'enhanced-incomplete' to the HTML element
 			
 ===tests===
-	type: object
-	description: Hash of key/value test methods and properties. Test fails upon first failing test. This option can be overridden with a new test suite.
-	default: The following tests are preloaded to run:
-		- getById: Tests for document.getElementById
-		- getByTagName: Tests for document.getElementsByTagName
-		- createEl: Tests for document.createElement
-		- boxmodel: Tests for basic CSS box model rendering
-		- position: Tests for basic CSS positioning rendering
-		- float: Tests CSS float rendering
-		- clear: Tests CSS clear rendering
-		- overflow: Tests CSS overflow rendering
-		- ajax: Tests for common Ajax support
-		- resize: Tests for window resize support
-		- print: Tests for window print support
+  * type: object
+  * description: Hash of key/value test methods and properties. Test fails upon first failing test. This option can be overridden with a new test suite.
+  * default: The following tests are preloaded to run:
+    * getById: Tests for document.getElementById
+    * getByTagName: Tests for document.getElementsByTagName
+    * createEl: Tests for document.createElement
+    * boxmodel: Tests for basic CSS box model rendering
+    * position: Tests for basic CSS positioning rendering
+    *  floatClear: Tests CSS float and clear rendering
+    * overflow: Tests CSS overflow rendering
+    * ajax: Tests for common Ajax support
+    * resize: Tests for window resize support
+    * print: Tests for window print support
 
 ===alertOnFailure===
-	type: boolean
-	description: For development only. Alert failed test result. (uses alert() for wide compatibility)
-	default: false
+  * type: boolean
+  * description: For development only. Alert failed test result. (uses alert() for wide compatibility)
+  * default: false
 	
 	
 	
@@ -136,16 +128,16 @@ In order to call these methods, you need to variablize your call to a new instan
 The following methods can be called post-test:
 
 ===forceFail===
-	type: function
-	description: Set cookie value to fail and refresh page.
+  * type: function
+  * description: Set cookie value to fail and refresh page.
 
 ===forcePass===
-	type: function
-	description: Set cookie value to pass and refresh page.
+  * type: function
+  * description: Set cookie value to pass and refresh page.
 	
 ===reTest===
-	type: function
-	description: Delete cookie and refresh page (re-run test)
+  * type: function
+  * description: Delete cookie and refresh page (re-run test)
 	
 	
 
@@ -195,14 +187,27 @@ Note that this class name will change based on your testName. Refer to the docum
 
 
 
+	
 
+==Additional Tests==
+
+The following tests can be useful depending on the needs of your application. To add them to the default suite, simply specify them via the addTests option.
+{{{
+//Test for HTML 5 canvas support
+canvas: function(){
+	var canvas_compatible = false;
+	try { canvas_compatible = !!(document.createElement('canvas').getContext('2d')); } // S60
+	catch(e) { canvas_compatible = !!(document.createElement('canvas').getContext); } // IE 
+	return canvas_compatible;
+}
+}}}
 
 
 
 
 ==Server-side Integration==
 
-The Enhance.js dev branch has a PHP-based server-side examples which can be used to easily integrate the library on the server-side your website. These files will detect whether a user has run your tests before and either:
+The Enhance.js dev branch includes a PHP-based server-side examples which can be used to integrate the library on the server-side your website for performance gains. _Note that these files are not in active development, but can be extended to work well in most implementations_ These files will detect whether a user has run your tests before and either:
  a. serve a pre-enhanced page for those who have passed
  b. serve a lightweight basic page for those who have failed
  c. serve the page normally, with basic assets and a call to enhance to load enhancements upon passing.
@@ -247,19 +252,3 @@ Example page:
 		</body>
 	</html>
 }}}			
-		
-		
-		
-
-==Additional Tests not included in suite==
-
-The following tests can be used depending on the needs of your application.
-{{{
-//Test for HTML 5 canvas support
-canvas: function(){
-	var canvas_compatible = false;
-	try { canvas_compatible = !!(document.createElement('canvas').getContext('2d')); } // S60
-	catch(e) { canvas_compatible = !!(document.createElement('canvas').getContext); } // IE 
-	return canvas_compatible;
-}
-}}}
