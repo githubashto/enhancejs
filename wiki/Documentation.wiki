@@ -1,37 +1,35 @@
 Enhance.js is a JavaScript library that performs capabilities testing to determine the level of experience a browser should receive. By using this library as prescribed, you can rest assured that most any user will be able to access and use your website.
 
 
-=======================================================
-Usage:
-=======================================================
+=Basic Usage=
 
 1. To use enhance.js, first attach the script to your page:
-	
+{{{	
 	<script type="text/javascript" src="enhance.js"></script>
-
+}}}
 2. Then add a script element beneath that for running EnhanceJS
-
+{{{
 	<script type="text/javascript">
 		//custom javascript goes here.
 	</script>
-
+}}}
 3. Within that script element, call the enhance() function depending on your needs:
-
+{{{
 	enhance();
 		--> Result: This will run the enhance library according to default configuration options.
-	
+
 	enhance(options);
 		--> Result: This will run the enhance library with a custom configuration, depending on the options argument.
-
+}}}
 Options are passed in object literal format, with key/value pairs, like this:
-
+{{{
 	enhance({
 		key: value,
 		key2: value2
 	});
-
+}}}
 or with real options:
-
+{{{
 	enhance({
 		loadScripts: [
 			'js/jquery-1.3.2.min.js', 
@@ -41,57 +39,66 @@ or with real options:
 			'css/enhanced.css'
 		]
 	});
-
+}}}
 
 For server-side advanced integration, see section below.
 
 
-=======================================================
-Options:
-=======================================================
+==Configurable Options==
 
 The following options are available for configuration:
 
-testName
+===testName===
 	type: string
 	description: If test passes, this string is added as a class to the html element, which is helpful for CSS scoping.
 		It is also used as the name of the cookie which saves the test result for subsequent page loads.
 	default: 'enhanced'
 	
-loadScripts
+===loadScripts===
 	type: array of strings
 	description: JavaScript file urls to load. 
 	default: []
 	
-loadStyles
+===loadStyles===
 	type: array of strings or objects
 	description: CSS file urls to load. Each array item can also be an object with attribute/value pairs, for setting attributes on the link element such as media types. 
 			Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. 
 			Accepted values are either "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
 	default: []
 
-queueLoading
+===queueLoading===
 	type: boolean
 	description: If true, JavaScript files in the loadScripts array are loaded consecutively to safeguard dependencies
 	default: true
 	
-appendToggleLink
+===appendToggleLink===
 	type: boolean
 	description: If true, an HTML link is appended to the body element allowing a user to force-pass or force-fail the test.
 		The link will have a class name of your testName value, plus '_toggleResult' (default: "enhanced_toggleResult")
 	default: true	
 	
-forcePassText
+===forcePassText===
 	type: string
 	description: Text for the appendToggleLink, if the link's behavior is to force-pass the test.
 	default: 'View High-bandwidth version'
 	
-forceFailText
+===forceFailText===
 	type: string
 	description: Text for the appendToggleLink, if the link's behavior is to force-fail the test.
 	default: 'View Low-bandwidth version'	
+
+===onPass===
+	default: empty function
+
+===onFail===
+	default: empty function
+
+===onLoadError===
+	type: function
+	description: If a script or stylesheet fails to load.
+	default: function that adds a class of 'enhanced-incomplete' to the HTML element
 			
-tests
+===tests===
 	type: object
 	description: Hash of key/value test methods and properties. Test fails upon first failing test. This option can be overridden with a new test suite.
 	default: The following tests are preloaded to run:
@@ -107,7 +114,7 @@ tests
 		- resize: Tests for window resize support
 		- print: Tests for window print support
 
-alertOnFailure
+===alertOnFailure===
 	type: boolean
 	description: For development only. Alert failed test result. (uses alert() for wide compatibility)
 	default: false
@@ -117,29 +124,27 @@ alertOnFailure
 	
 	
 	
-			
-=======================================================
-Methods:
-=======================================================
+==Methods==
 
 After running the test, you can call several methods on the test object. 
 In order to call these methods, you need to variablize your call to a new instance of enhance(), like this:
+{{{
 	var myEnhancements = new enhance();
 	//call a method
 	myEnhancements.forceFail();
-	
+}}}	
 	
 The following methods can be called post-test:
 
-forceFail
+===forceFail===
 	type: function
 	description: Set cookie value to fail and refresh page.
 
-forcePass
+===forcePass===
 	type: function
 	description: Set cookie value to pass and refresh page.
 	
-reTest
+===reTest===
 	type: function
 	description: Delete cookie and refresh page (re-run test)
 	
@@ -148,48 +153,43 @@ reTest
 	
 	
 
-=======================================================
-Integration Tips:
-=======================================================
+==Integration Tips==
 
-Dynamic CSS/JS loading
+===Dynamic CSS/JS loading===
 We highly recommend setting up your page to link only the necessary CSS and JS files for your basic experience
 and then specifying further files to load via enhance options. The difference between basic and enhanced 
 versions can be several hundred kb on the average website, so there's a lot of benefits to making this separation. 
 
 
 
-Preventing FOUC:
-When using enhance.js, you might experience what's known as a Flash of Unstyled Content, or "FOUC." 
-This side effect occurs whenever CSS is loaded and applied after a page begins visually rendering, 
-causing a flash or jump between unstyled and styled content.
-This can be prevented in a number of ways, and if possible, the optional backend integration of this script 
-is the best solution. In any case, you can make the FOUC less of a problem by hiding the body content in 
-your basic stylesheet, and then showing it with styles delivered in your enhanced stylesheet. The safe 
-way to do this is to key your styles off of the <html> element with the test class applied. Like this:
+===Preventing FOUC===
+When using enhance.js, you might experience what's known as a Flash of Unstyled Content, or "FOUC." This side effect occurs whenever CSS is loaded and applied after a page begins visually rendering, causing a flash or jump between unstyled and styled content. This can be prevented in a number of ways. You can make the FOUC less of a problem by hiding the body content in your basic stylesheet, and then showing it with styles delivered in your enhanced stylesheet. The safe way to do this is to key your styles off of the <html> element with the test class applied. Like this:
 
 basic.css:
+{{{
 	html.enhanced body { visibility: hidden; }
-
+	html.enhanced-incomplete body { visibility: visible; }
+}}}
 enhanced.css:	
+{{{
 	html.enhanced body { visibility: visible; }
+}}}
 
-Since the class name (which varies depending on your testName option) is applied immediately upon passing the test, 
-this will allow your page to just be blank until all styles are loaded.
-
-
+Since the class name (which varies depending on your testName option) is applied immediately upon passing the test, this will allow your page to just be blank until all styles are loaded. The second rule in basic.css above will make sure the page is visible if any stylesheets fail to load.
 
 
-Styling the Toggle link
+
+
+===Styling the Toggle link===
 By default, enhance.js will append a link to the body element which allows a user to force a pass or fail
 result and refresh. This is useful for situations when something went wrong in the enhanced version of your 
 application, rendering it unusable, or even for mobile users who simply prefer a faster site. We recommend
 styling this link very simply in the basic version, and using the enhanced scripts and styles to change
 its style and positioning if preferable. Using our default testName of "enhanced", the link can be styled
 like this:
-
+{{{
 a.enhanced_toggleResult {... css goes here... }
-
+}}}
 Note that this class name will change based on your testName. Refer to the documentation above.
 
 
@@ -201,12 +201,9 @@ Note that this class name will change based on your testName. Refer to the docum
 
 
 
-=======================================================
-Server-side Integration:
-=======================================================	
+==Server-side Integration==
 
-Enhance.js comes with a PHP-based server-side package which can be used to easily integrate the
-library into your website. These files will detect whether a user has run your tests before and either:
+The Enhance.js dev branch has a PHP-based server-side examples which can be used to easily integrate the library on the server-side your website. These files will detect whether a user has run your tests before and either:
  a. serve a pre-enhanced page for those who have passed
  b. serve a lightweight basic page for those who have failed
  c. serve the page normally, with basic assets and a call to enhance to load enhancements upon passing.
@@ -219,8 +216,9 @@ To integrate, you can find the following files in the enhance/server/ folder:
 
 
 PHP includes require a PHP-enabled server, and look like this:
+{{{
 	<? include("/enhance/server/head.php"); ?>
-
+}}}
 config.php has variables for each of the options found in the JavaScript version of enhance.js.
 Just fill them out with values as you would for the options documented above, and include the 2 other php
 files where specified, and that's it!
@@ -229,15 +227,16 @@ files where specified, and that's it!
 Footer link considerations:
 The footer include adds a link similar to that of the JavaScript library, with an ID of your testName plus "_fallback_link".
 We suggest removing this with your enhanced JavaScript file, like this:
-
+{{{
 	var phpFallbackLink = document.getElementById('enhanced_fallback_link');
 	document.removeChild(phpFallbackLink);
-		
+}}}		
 	
 	
 	
 	
 Example page:
+{{{
 	<html>
 		<head>
 			<title></title>
@@ -248,18 +247,15 @@ Example page:
 			<? include("/enhance/server/footer.php"); ?>
 		</body>
 	</html>
-			
+}}}			
 		
 		
 		
 
-=======================================================
-Bonus: Additional Tests not included in suite:
-=======================================================
+==Additional Tests not included in suite==
 
 The following tests can be used depending on the needs of your application.
--------------------------------------------------------
-
+{{{
 //Test for HTML 5 canvas support
 canvas: function(){
 	var canvas_compatible = false;
@@ -267,3 +263,4 @@ canvas: function(){
 	catch(e) { canvas_compatible = !!(document.createElement('canvas').getContext); } // IE 
 	return canvas_compatible;
 }
+}}}
