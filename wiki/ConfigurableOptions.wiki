@@ -1,3 +1,75 @@
+=Configurable Options=
+
+The following options are available for configuration:
+
+===testName===
+  * type: string
+  * description: If test passes, this string is added as a class to the html element, which is helpful for CSS scoping. It is also used as the name of the cookie which saves the test result for subsequent page loads.
+  * default: 'enhanced'
+	
+===loadScripts===
+  * type: array of strings
+  * description: JavaScript file urls to load. 
+  * default: []
+	
+===loadStyles===
+  * type: array of strings or objects
+  * description: CSS file urls to load. Each array item can also be an object with attribute/value pairs, for setting attributes on the link element such as media types. Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. Accepted values are either "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
+  * default: []
+
+===queueLoading===
+  * type: boolean
+  * description: If true, JavaScript files in the loadScripts array are loaded consecutively to safeguard dependencies
+  * default: true
+	
+===appendToggleLink===
+  * type: boolean
+  * description: If true, an HTML link is appended to the body element allowing a user to force-pass or force-fail the test. The link will have a class name of your testName value, plus '_toggleResult' (default: "enhanced_toggleResult")
+  * default: true	
+	
+===forcePassText===
+  * type: string
+  * description: Text for the appendToggleLink, if the link's behavior is to force-pass the test.
+  * default: 'View High-bandwidth version'
+	
+===forceFailText===
+  * type: string
+  * description: Text for the appendToggleLink, if the link's behavior is to force-fail the test.
+  * default: 'View Low-bandwidth version'	
+
+===onPass===
+  * default: empty function
+
+===onFail===
+  * default: empty function
+
+===onLoadError===
+  * type: function
+  * description: If a script or stylesheet fails to load.
+  * default: function that adds a class of 'enhanced-incomplete' to the HTML element
+			
+===tests===
+  * type: object
+  * description: Hash of key/value test methods and properties. Test fails upon first failing test. This option can be overridden with a new test suite.
+  * default: The following tests are preloaded to run:
+    * getById: Tests for document.getElementById
+    * getByTagName: Tests for document.getElementsByTagName
+    * createEl: Tests for document.createElement
+    * boxmodel: Tests for basic CSS box model rendering
+    * position: Tests for basic CSS positioning rendering
+    *  floatClear: Tests CSS float and clear rendering
+    * overflow: Tests CSS overflow rendering
+    * ajax: Tests for common Ajax support
+    * resize: Tests for window resize support
+    * print: Tests for window print support
+
+===alertOnFailure===
+  * type: boolean
+  * description: For development only. Alert failed test result. (uses alert() for wide compatibility)
+  * default: false
+	
+	
+	
 =Methods=
 
 After running the test, you can call several methods on the test object. 
