@@ -154,7 +154,7 @@ versions can be several hundred kb on the average website, so there's a lot of b
 
 
 ===Preventing FOUC===
-When using enhance.js, you might experience what's known as a Flash of Unstyled Content, or "FOUC." This side effect occurs whenever CSS is loaded and applied after a page begins visually rendering, causing a flash or jump between unstyled and styled content. This can be prevented in a number of ways. You can make the FOUC less of a problem by hiding the body content in your basic stylesheet, and then showing it with styles delivered in your enhanced stylesheet. The safe way to do this is to key your styles off of the <html> element with the test class applied. Like this:
+When using enhance.js, you might experience what's known as a Flash of Unstyled Content, or "FOUC." This side effect occurs whenever CSS is loaded and applied after a page begins visually rendering, causing a flash or jump between unstyled and styled content. This can be prevented in a number of ways. You can make the FOUC less of a problem by hiding the body content in your basic stylesheet, and then showing it with styles delivered in your enhanced stylesheet. The safe way to do this is to key your styles off of the html element with the test class applied. Like this:
 
 basic.css:
 {{{
