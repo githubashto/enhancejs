@@ -1,13 +1,16 @@
-#summary One-sentence summary of this page.
 
-= Introduction =
+=Additional Tests=
 
-Add your content here.
+The following tests can be useful depending on the needs of your application. To add them to the default suite, simply specify them via the addTests option.
 
+==Canvas==
 
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+{{{
+//Test for HTML 5 canvas support
+canvas: function(){
+	var canvas_compatible = false;
+	try { canvas_compatible = !!(document.createElement('canvas').getContext('2d')); } // S60
+	catch(e) { canvas_compatible = !!(document.createElement('canvas').getContext); } // IE 
+	return canvas_compatible;
+}
+}}}
