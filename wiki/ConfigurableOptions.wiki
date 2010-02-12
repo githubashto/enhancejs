@@ -1,3 +1,5 @@
+#summary Documentation of all available options in EnhanceJS
+
 =Configurable Options=
 
 The following options are available for configuration:
@@ -38,9 +40,13 @@ The following options are available for configuration:
   * default: 'View Low-bandwidth version'	
 
 ===onPass===
+  * type: function
+  * description: function that executes when a browser passes test suite. Mostly useful when developing tests.
   * default: empty function
 
 ===onFail===
+  * type: function
+  * description: function that executes when a browser fails test suite. Mostly useful when developing tests.
   * default: empty function
 
 ===onLoadError===
