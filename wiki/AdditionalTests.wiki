@@ -1,3 +1,4 @@
+#summary A list of additional tests built to run with EnhanceJS
 
 =Additional Tests=
 
