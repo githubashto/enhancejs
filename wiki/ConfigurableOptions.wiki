@@ -1,13 +1,25 @@
-#summary One-sentence summary of this page.
+=Methods=
 
-= Introduction =
+After running the test, you can call several methods on the test object. 
+In order to call these methods, you need to variablize your call to a new instance of enhance(), like this:
+{{{
+	var myEnhancements = new enhance();
+	//call a method
+	myEnhancements.forceFail();
+}}}	
+	
+The following methods can be called post-test:
 
-Add your content here.
+===forceFail===
+  * type: function
+  * description: Set cookie value to fail and refresh page.
 
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+===forcePass===
+  * type: function
+  * description: Set cookie value to pass and refresh page.
+	
+===reTest===
+  * type: function
+  * description: Delete cookie and refresh page (re-run test)
+	
+	
