@@ -41,7 +41,6 @@ or with real options:
 	});
 }}}
 
-For server-side advanced integration, see section below.
 
 
 ==Configurable Options==
@@ -170,7 +169,7 @@ basic.css:
 	html.enhanced body { visibility: hidden; }
 	html.enhanced-incomplete body { visibility: visible; }
 }}}
-enhanced.css:	
+at the end of enhanced.css (or your final enhanced css file):	
 {{{
 	html.enhanced body { visibility: visible; }
 }}}
