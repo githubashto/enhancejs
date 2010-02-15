@@ -1,7 +1,7 @@
 /*
  * enhance.js - Test-Driven Progressive Enhancement
  * Authors: Scott Jehl (filamentgroup.com), Brandon Aaron (brandonaaron.net)
- * Dual licensed under the MIT (filamentgroup.com/examples/mit-license.txt) and GPL (filamentgroup.com/examples/gpl-license.txt) licenses.
+ * Licensed under MIT (filamentgroup.com/examples/mit-license.txt)
 */
 (function(win, doc) {
 var settings, body, windowLoaded, head;
