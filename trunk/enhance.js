@@ -1,5 +1,6 @@
 /*
  * EnhanceJS version 1.0a - Test-Driven Progressive Enhancement
+ * http://enhancejs.googlecode.com/
  * Copyright (c) 2010 Filament Group, Inc, authors.txt
  * Licensed under MIT (license.txt)
 */
