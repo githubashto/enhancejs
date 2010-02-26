@@ -4,7 +4,7 @@
  * Copyright (c) 2010 Filament Group, Inc, authors.txt
  * Licensed under MIT (license.txt)
 */
-(function(win, doc) {
+(function(win, doc, undefined) {
 var settings, body, windowLoaded, head;
 	
 if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || doc.documentElement; }
