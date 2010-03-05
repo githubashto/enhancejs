@@ -78,12 +78,12 @@ The following options are available for configuration:
 	
 =Methods=
 
-After running the test, you can call several methods on the test object. 
-In order to call these methods, you need to variablize your call to a new instance of enhance(), like this:
+After running the test, you can call several methods on the enhance object. 
+
 {{{
-	var myEnhancements = new enhance();
-	//call a method
-	myEnhancements.forceFail();
+	enhance();
+	//set cookie to false and refresh, loading low-fi version
+	enhance.forceFail();
 }}}	
 	
 The following methods can be called post-test:
