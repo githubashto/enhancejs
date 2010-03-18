@@ -314,7 +314,7 @@ function appendScriptsSync() {
             return;
         }
         
-        var item    = queue.shift();
+        var item    = queue.shift(),
             script = createScriptTag(item),
             done   = false;
         if(script){
