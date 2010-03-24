@@ -125,7 +125,8 @@ enhance.defaultSettings = {
     alertOnFailure: false,
     onPass: function(){},
     onFail: function(){},
-    onLoadError: addIncompleteClass
+    onLoadError: addIncompleteClass,
+    onScriptsLoaded: function(){}
 };
 
 function cookiesSupported(){
@@ -255,6 +256,9 @@ function enhancePage() {
     if (settings.loadScripts.length) {
         settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
     }
+    else{
+    	settings.onScriptsLoaded();
+    }
 }
 
 function addIncompleteClass (){
@@ -311,7 +315,7 @@ function appendScriptsSync() {
     
     function next() {
         if (queue.length === 0) {
-            return;
+            return false;
         }
         
         var item    = queue.shift(),
@@ -321,14 +325,16 @@ function appendScriptsSync() {
 	        script.onload = script.onreadystatechange = function() {
 	            if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
 	                done = true;
-	                next();
+	                if(next() === false){
+	                	settings.onScriptsLoaded();
+	                }
 	                this.onload = this.onreadystatechange = null;
 	            }
 	        }
 	        head.insertBefore(script, head.firstChild);
         }
         else{
-        	next();
+        	return next();
         }
     }
     
@@ -345,6 +351,7 @@ function appendScriptsAsync() {
         	head.insertBefore(script, head.firstChild);
         }	
     }
+    settings.onScriptsLoaded();
 }
 
 function createScriptTag(item) {
