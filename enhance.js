@@ -130,6 +130,7 @@ enhance.defaultSettings = {
 };
 
 function cookiesSupported(){
+	if(!!!doc.cookie){ return false; }
 	var testCookie = 'enhancejs-cookietest';
 	createCookie(testCookie, 'enabled');
 	var result = readCookie(testCookie);
