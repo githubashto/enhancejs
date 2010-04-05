@@ -10,7 +10,7 @@ var settings, body, windowLoaded, head;
 if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || doc.documentElement; }
 else{ head = doc.documentElement; }
 
-enhance = function(options) {
+win.enhance = function(options) {
     options  = options || {};
     settings = {};
     
