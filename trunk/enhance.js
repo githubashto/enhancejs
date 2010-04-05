@@ -290,12 +290,15 @@ function appendStyles() {
                     link.setAttribute(attr, item[attr]);
                 }    
             }
-            if (item['iecondition'] && isIE()) {
+            if (item['iecondition']) {
                 if (isIE(item['iecondition'])) {
                     head.appendChild(link); 
                 }
+                else{
+                	return false;
+                }
             }
-            else if (!item['iecondition']) {
+            else {
                 head.appendChild(link);
             }
         }
@@ -370,16 +373,16 @@ function createScriptTag(item) {
                 script.setAttribute(attr, item[attr]);
             }    
         }
-        if (item['iecondition'] && isIE()) {
+        if (item['iecondition']) {
             if (isIE(item['iecondition'])) {
                 return script;
             }
+            else {
+            	return false;
+            }
         }
-        else if (!item['iecondition']) {
+        else {
             return script;
-        }
-        else{
-        	return false;
         }
     }
 }
