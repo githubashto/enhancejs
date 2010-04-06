@@ -94,7 +94,11 @@ enhance({
   * description: For development only. Alert failed test result. (uses alert() for wide compatibility)
   * default: false
 	
-	
+===onScriptsLoaded===
+  * type: callback function
+  * description: callback that executes when all loadScripts scripts have finished loading
+  * default: empty function
+
 	
 =Methods=
 
