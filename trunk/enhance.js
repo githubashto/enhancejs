@@ -305,14 +305,31 @@ function appendStyles() {
     }
 }
 
-function isIE(version) {
-	var isIE = (/MSIE (\d+)\.\d+;/).test(navigator.userAgent);
-	var ieVersion = new Number(RegExp.$1);
-	if(isIE && version){
-		if (version === 'all' || version == ieVersion) { return true; }
-	}
-	else{ return isIE; }
-}
+var isIE = (function() {
+	var cache = {},b;
+    	
+    return function(condition) {	
+    	if(/*@cc_on!@*/true){return false;}
+		var cc = 'IE';
+		if(condition){ 
+			if(condition !== 'all'){ //deprecated support for 'all' keyword
+				if( !isNaN(parseFloat(condition)) ){ 
+					cc += ' ' + condition; //deprecated support for straight version #
+				}
+				else {
+					cc = condition; //recommended (conditional comment syntax)
+				}
+			}
+		}
+		
+		if (cache[cc] === undefined) {
+			b = b || doc.createElement('B');
+			b.innerHTML = '<!--[if '+ cc +']><b></b><![endif]-->';
+			cache[cc] = !!b.getElementsByTagName('b').length;
+		}
+		return cache[cc];
+	}	
+})();
 
 function appendScriptsSync() {
     var queue = [].concat(settings.loadScripts);
