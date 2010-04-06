@@ -5,10 +5,11 @@
  * Licensed under MIT (license.txt)
 */
 (function(win, doc, undefined) {
-var settings, body, windowLoaded, head;
+var settings, body, windowLoaded, head, 
+	docElem = doc.documentElement;
 	
-if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || doc.documentElement; }
-else{ head = doc.documentElement; }
+if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || docElem; }
+else{ head = docElem; }
 
 win.enhance = function(options) {
     options  = options || {};
@@ -247,8 +248,8 @@ function appendToggleLinks(result) {
 }
 
 function enhancePage() {
-    if (doc.documentElement.className.indexOf(settings.testName) === -1) {
-        doc.documentElement.className += ' ' + settings.testName;
+    if (docElem.className.indexOf(settings.testName) === -1) {
+        docElem.className += ' ' + settings.testName;
     }
     
     if (settings.loadStyles.length) {
@@ -264,8 +265,8 @@ function enhancePage() {
 
 function addIncompleteClass (){
 	var errorClass = settings.testName + '-incomplete';
-	if (doc.documentElement.className.indexOf(errorClass) === -1) {
-        doc.documentElement.className += ' ' + errorClass;
+	if (docElem.className.indexOf(errorClass) === -1) {
+        docElem.className += ' ' + errorClass;
     }
 }
 
