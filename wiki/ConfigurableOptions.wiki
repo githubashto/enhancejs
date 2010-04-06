@@ -11,12 +11,12 @@ The following options are available for configuration:
 	
 ===loadScripts===
   * type: array of strings
-  * description: JavaScript file urls to load. 
+  * description: JavaScript file urls to load. Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. Accepted values work like conditional comments in ie: 'IE 7', 'IE 6', 'lte IE 7', etc, or you can specify "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
   * default: []
 	
 ===loadStyles===
   * type: array of strings or objects
-  * description: CSS file urls to load. Each array item can also be an object with attribute/value pairs, for setting attributes on the link element such as media types. Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. Accepted values are either "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
+  * description: CSS file urls to load. Each array item can also be an object with attribute/value pairs, for setting attributes on the link element such as media types. Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. Accepted values work like conditional comments in ie: 'IE 7', 'IE 6', 'lte IE 7', etc, or you can specify "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
   * default: []
 
 ===queueLoading===
