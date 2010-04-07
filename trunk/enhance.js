@@ -81,13 +81,14 @@ enhance.defaultTests = {
         body.removeChild(newDiv);
         return pass;
     },
-    overflow: function() {
+    heightOverflow: function() {
         var newDiv = doc.createElement('div');
-        newDiv.innerHTML = '<div style="height: 10px; overflow: hidden;"></div>';
+        newDiv.innerHTML = '<div style="height: 10px;"></div>';
+        newDiv.style.cssText = 'overflow: hidden; height: 0;';
         body.appendChild(newDiv);
         var divHeight = newDiv.offsetHeight;
         body.removeChild(newDiv);
-        return divHeight === 10;
+        return divHeight === 0;
     },
     ajax: function() {
         //factory test borrowed from quirksmode.org
