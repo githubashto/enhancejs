@@ -147,7 +147,6 @@ function forceFail() {
 }
 if(enhance.cookiesSupported){ enhance.forceFail = forceFail; }
 
-
 function forcePass() {
     createCookie(settings.testName, 'pass');
     win.location.reload();
@@ -198,11 +197,11 @@ function runTests() {
             if (pass) {
                 enhancePage();
                 settings.onPass();
-            } else {
+            }
+            else {
                 settings.onFail();
             }
             
-            // append toggle link
             if (settings.appendToggleLink) {
                 windowLoad(function() { 
                     appendToggleLinks(result);
@@ -237,7 +236,6 @@ function windowLoad(callback) {
 
 function appendToggleLinks(result) {
     if (!settings.appendToggleLink || !enhance.cookiesSupported) { return; }
-        
     if (result) {
         var a = doc.createElement('a');
         a.href = "#";
@@ -252,7 +250,6 @@ function enhancePage() {
     if (docElem.className.indexOf(settings.testName) === -1) {
         docElem.className += ' ' + settings.testName;
     }
-    
     if (settings.loadStyles.length) {
         appendStyles();
     }
@@ -277,7 +274,6 @@ function appendStyles() {
     
     while ((item = settings.loadStyles[++index])) {
         var link  = doc.createElement('link');
-        
         link.type = 'text/css';
         link.rel  = 'stylesheet';
         link.onerror = settings.onLoadError;
@@ -308,7 +304,8 @@ function appendStyles() {
 }
 
 var isIE = (function() {
-	var cache = {},b;
+	var cache = {},
+		b;
     	
     return function(condition) {	
     	if(/*@cc_on!@*/true){return false;}
@@ -450,7 +447,7 @@ function applyDocReadyHack() {
         // set readyState = loading or interactive
         // it does not really matter for this purpose
         doc.readyState = "loading";
-			}
+	}
 }
 		
 		
