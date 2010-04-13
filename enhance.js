@@ -6,7 +6,8 @@
 */
 (function(win, doc, undefined) {
 var settings, body, windowLoaded, head, 
-	docElem = doc.documentElement;
+	docElem = doc.documentElement,
+	testPass = false;
 	
 if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || docElem; }
 else{ head = docElem; }
@@ -26,12 +27,20 @@ win.enhance = function(options) {
         settings.tests[test] = options.addTests[test];
     }
     
+    //add testName class immediately for FOUC prevention, remove later on fail
+    if (docElem.className.indexOf(settings.testName) === -1) {
+        docElem.className += ' ' + settings.testName;
+    }
+    
+    //fallback for removing testName class
+    setTimeout(function(){ if(!testPass){ removeHTMLClass(); } }, 3000);
+
     runTests();
     
     applyDocReadyHack();
     
-    windowLoad(function() {
-        windowLoaded = true;
+    windowLoad(function() { 
+    	windowLoaded = true; 
     });
 };
 
@@ -169,6 +178,7 @@ function runTests() {
             settings.onPass();
         } else {
             settings.onFail();
+            removeHTMLClass();
         }
         
         // append toggle link
@@ -200,8 +210,9 @@ function runTests() {
             }
             else {
                 settings.onFail();
+                removeHTMLClass();
             }
-            
+                        
             if (settings.appendToggleLink) {
                 windowLoad(function() { 
                     appendToggleLinks(result);
@@ -246,10 +257,12 @@ function appendToggleLinks(result) {
     }
 }
 
+function removeHTMLClass(){
+	docElem.className = docElem.className.replace(settings.testName,'');
+}
+
 function enhancePage() {
-    if (docElem.className.indexOf(settings.testName) === -1) {
-        docElem.className += ' ' + settings.testName;
-    }
+	testPass = true;
     if (settings.loadStyles.length) {
         appendStyles();
     }
