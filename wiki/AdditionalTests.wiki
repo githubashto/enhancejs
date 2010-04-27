@@ -30,15 +30,3 @@ If you want to build complex floated layouts without having to worry about IE6 w
     }
 }}}
 
-
-==Canvas==
-
-{{{
-//Test for HTML 5 canvas support
-canvas: function(){
-	var canvas_compatible = false;
-	try { canvas_compatible = !!(document.createElement('canvas').getContext('2d')); } // S60
-	catch(e) { canvas_compatible = !!(document.createElement('canvas').getContext); } // IE 
-	return canvas_compatible;
-}
-}}}
