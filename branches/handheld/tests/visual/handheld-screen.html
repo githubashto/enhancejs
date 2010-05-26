@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+	<title>EnhanceJS Visual Pass/Fail Test Page</title>
+	<link href="css/all.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="../../enhance.js"></script>		
+	<script type="text/javascript">
+		// Run capabilities test
+		enhance({
+			loadStyles: [
+				{'media': 'screen', href: 'css/pass.css'},
+				{'media': 'screen and (max-device-width: 480px)', href: 'css/handheld.css'}
+			],
+			loadScripts: [
+				'http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js',
+				{'media': 'screen', src: 'js/pass.js'},
+				{'media': 'screen and (max-device-width: 480px)', src: 'js/handheld.js'}
+			]	
+		});   
+    </script>
+</head>
+<body>
+
+	<h1 id="enhanceMsg">Basic</h1>
+
+</body>
+</html>

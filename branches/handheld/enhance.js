@@ -305,12 +305,9 @@ function appendStyles() {
                 if (isIE(item['iecondition'])) {
                     head.appendChild(link); 
                 }
-                else{
-                	return false;
-                }
             }
             else {
-                head.appendChild(link);
+            	head.appendChild(link);
             }
         }
     }
@@ -342,6 +339,34 @@ var isIE = (function() {
 		return cache[cc];
 	}	
 })();
+
+
+//test whether a media query applies
+var mediaquery = (function(){
+	var cache = {};
+	return function(q){
+		if (cache[q] === undefined) {
+			var testDiv = doc.createElement('div');
+			testDiv.setAttribute('id','ejs-qtest');
+			var styleBlock = doc.createElement('style');
+			styleBlock.type = "text/css";
+			/*set inner css text. credit: http://www.phpied.com/dynamic-script-and-style-elements-in-ie/*/
+			var cssrule = '@media '+q+' { #ejs-qtest { position: absolute; width: 10px; } }';
+			if (styleBlock.styleSheet){ styleBlock.styleSheet.cssText = cssrule; }
+			else { styleBlock.appendChild(doc.createTextNode(cssrule)); }     
+			head.appendChild(styleBlock);
+			doc.body.appendChild(testDiv);
+			var divWidth = testDiv.offsetWidth;
+			doc.body.removeChild(testDiv);
+			head.removeChild(styleBlock);
+			cache[q] = (divWidth == 10);
+		}
+		return cache[q];
+	}
+})();
+
+enhance.query = mediaquery;
+
 
 function appendScriptsSync() {
     var queue = [].concat(settings.loadScripts);
@@ -398,8 +423,8 @@ function createScriptTag(item) {
     }
     else {
         for (var attr in item) {
-            if (attr !== 'iecondition') {
-                script.setAttribute(attr, item[attr]);
+            if (attr !== 'iecondition' && attr !== 'media') {
+            	script.setAttribute(attr, item[attr]);
             }    
         }
         if (item['iecondition']) {
@@ -409,6 +434,9 @@ function createScriptTag(item) {
             else {
             	return false;
             }
+        }
+        if(item['media']){
+        	return mediaquery(item['media']) ? script : false;
         }
         else {
             return script;
