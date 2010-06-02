@@ -1,3 +1,3 @@
 $(function(){
-	$('#enhanceMsg').text('Enhanced');
+	$('#enhanceMsg').text('Enhanced');	
 });

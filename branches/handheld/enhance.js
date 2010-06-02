@@ -7,7 +7,8 @@
 (function(win, doc, undefined) {
 var settings, body, windowLoaded, head, 
 	docElem = doc.documentElement,
-	testPass = false;
+	testPass = false,
+	mediaCookieA, mediaCookieB, toggledMedia;
 	
 if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || docElem; }
 else{ head = docElem; }
@@ -31,6 +32,11 @@ win.enhance = function(options) {
     if (docElem.className.indexOf(settings.testName) === -1) {
         docElem.className += ' ' + settings.testName;
     }
+    
+    //cookie names for toggled media types
+    mediaCookieA = settings.testName + '-toggledmediaA';
+	mediaCookieB = settings.testName + '-toggledmediaB';
+	toggledMedia = [readCookie(mediaCookieA), readCookie(mediaCookieB)];
     
     //fallback for removing testName class
     setTimeout(function(){ if(!testPass){ removeHTMLClass(); } }, 3000);
@@ -266,12 +272,11 @@ function enhancePage() {
 	//check if loadscripts/loadstyles contain js-dependent mediaqueries (if so, wait for doc.body)
 	function needsJSMediaQueries(arr){
 		var needsJSMediaQueries = false;
-			isJS = (arr == settings.loadScripts);
     	for(var item in arr){
     		//still false and arr item is an obj
     		if(!needsJSMediaQueries && typeof arr[item] !== 'string'){
-    			//for js, both ex and media use doc.body, for css only ex does
-    			needsJSMediaQueries = isJS ? (!!arr[item]['excludemedia'] || !!arr[item]['media']) : !!arr[item]['excludemedia'];
+    			//both ex and media use doc.body
+    			needsJSMediaQueries = (!!arr[item]['excludemedia'] || !!arr[item]['media']);
     		}
     	}
     	return needsJSMediaQueries;
@@ -298,6 +303,20 @@ function enhancePage() {
     }
 }
 
+//media toggling methods and storage
+function toggleMedia(mediaA,mediaB){
+	if(readCookie(mediaCookieA) && readCookie(mediaCookieB)){
+		eraseCookie(mediaCookieA);
+		eraseCookie(mediaCookieB);
+	}
+	else{
+		createCookie(mediaCookieA, mediaA);
+		createCookie(mediaCookieB, mediaB);
+	}
+	win.location.reload();
+}
+enhance.toggleMedia = toggleMedia;
+
 function addIncompleteClass (){
 	var errorClass = settings.testName + '-incomplete';
 	if (docElem.className.indexOf(errorClass) === -1) {
@@ -321,11 +340,14 @@ function appendStyles() {
         }
         else {
             for (var attr in item) {
-                if (attr !== 'iecondition') {
+                if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia') {
                     link.setAttribute(attr, item[attr]);
                 }    
             }
             var applies = true;
+            if(item['media']){
+            	applies = mediaquery(item['media']);
+	        }
             if(item['excludemedia']){
             	applies = !mediaquery(item['excludemedia']);
 	        }
@@ -371,6 +393,11 @@ var isIE = (function() {
 var mediaquery = (function(){
 	var cache = {};
 	return function(q){
+		//check if any media types should be toggled
+		if(toggledMedia[0] && toggledMedia[1]){
+			if(q == toggledMedia[0]){ q = toggledMedia[1]; }
+			if(q == toggledMedia[1]){ q = toggledMedia[0]; }
+		}
 		if (cache[q] === undefined) {
 			var testDiv = doc.createElement('div');
 			testDiv.setAttribute('id','ejs-qtest');
