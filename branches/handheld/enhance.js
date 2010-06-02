@@ -436,23 +436,17 @@ function createScriptTag(item) {
             	script.setAttribute(attr, item[attr]);
             }    
         }
-        if (item['iecondition']) {
-            if (isIE(item['iecondition'])) {
-                return script;
-            }
-            else {
-            	return false;
-            }
-        }
+        var applies = true;
         if(item['media']){
-        	return mediaquery(item['media']) ? script : false;
+        	applies = mediaquery(item['media']);
         }
         if(item['notmedia']){
-        	return mediaquery(item['notmedia']) ? false : script;
+        	applies = !mediaquery(item['notmedia']);
         }
-        else {
-            return script;
+        if (item['iecondition']) {
+                applies = isIE(item['iecondition']);
         }
+        return applies ? script : false;
     }
 }
 
