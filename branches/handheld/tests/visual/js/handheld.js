@@ -3,7 +3,7 @@ $(function(){
 	
 	//desktop toggle link
 	if(enhance.cookiesSupported){
-		$('<a href="#" class="mobiledesktoptoggle">View desktop version</a>')
+		$('<a href="#" class="mobiledesktoptoggle">View screen version</a>')
 			.click(function(){
 				enhance.toggleMedia('screen', 'screen and (max-device-width: 480px)');
 			})
