@@ -306,6 +306,15 @@ function appendStyles() {
                     head.appendChild(link); 
                 }
             }
+            else if(item['notmedia']){
+            	bodyOnReady((function(item,link){
+            		return function(){
+			        	if(!mediaquery(item['notmedia'])){
+			        			head.appendChild(link);
+			        	}
+		        	};
+	        	})(item,link));
+	        }
             else {
             	head.appendChild(link);
             }
@@ -423,7 +432,7 @@ function createScriptTag(item) {
     }
     else {
         for (var attr in item) {
-            if (attr !== 'iecondition' && attr !== 'media') {
+            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'notmedia') {
             	script.setAttribute(attr, item[attr]);
             }    
         }
@@ -437,6 +446,9 @@ function createScriptTag(item) {
         }
         if(item['media']){
         	return mediaquery(item['media']) ? script : false;
+        }
+        if(item['notmedia']){
+        	return mediaquery(item['notmedia']) ? false : script;
         }
         else {
             return script;
