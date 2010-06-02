@@ -263,11 +263,35 @@ function removeHTMLClass(){
 
 function enhancePage() {
 	testPass = true;
+	//check if loadscripts/loadstyles contain js-dependent mediaqueries (if so, wait for doc.body)
+	function needsJSMediaQueries(arr){
+		var needsJSMediaQueries = false;
+			isJS = (arr == settings.loadScripts);
+    	for(var item in arr){
+    		//still false and arr item is an obj
+    		if(!needsJSMediaQueries && typeof arr[item] !== 'string'){
+    			//for js, both ex and media use doc.body, for css only ex does
+    			needsJSMediaQueries = isJS ? (!!arr[item]['excludemedia'] || !!arr[item]['media']) : !!arr[item]['excludemedia'];
+    		}
+    	}
+    	return needsJSMediaQueries;
+	}
+	
     if (settings.loadStyles.length) {
-        appendStyles();
+    	if(needsJSMediaQueries(settings.loadStyles)){
+    		bodyOnReady(appendStyles);
+    	}
+    	else{
+    		appendStyles();
+    	}
     }
     if (settings.loadScripts.length) {
-        settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
+    	if(needsJSMediaQueries(settings.loadScripts)){
+    		bodyOnReady(appendScripts);
+    	}
+    	else{
+    		appendScripts();
+    	}        
     }
     else{
     	settings.onScriptsLoaded();
@@ -301,23 +325,16 @@ function appendStyles() {
                     link.setAttribute(attr, item[attr]);
                 }    
             }
-            if (item['iecondition']) {
-                if (isIE(item['iecondition'])) {
-                    head.appendChild(link); 
-                }
-            }
-            else if(item['excludemedia']){
-            	bodyOnReady((function(item,link){
-            		return function(){
-			        	if(!mediaquery(item['excludemedia'])){
-			        			head.appendChild(link);
-			        	}
-		        	};
-	        	})(item,link));
+            var applies = true;
+            if(item['excludemedia']){
+            	applies = !mediaquery(item['excludemedia']);
 	        }
-            else {
-            	head.appendChild(link);
+	        if (item['iecondition']) {
+                applies = isIE(item['iecondition']);
             }
+	        if(applies){ 
+	        	head.appendChild(link); 
+	        }
         }
     }
 }
@@ -376,6 +393,9 @@ var mediaquery = (function(){
 
 enhance.query = mediaquery;
 
+function appendScripts(){
+	settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
+}
 
 function appendScriptsSync() {
     var queue = [].concat(settings.loadScripts);
