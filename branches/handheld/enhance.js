@@ -306,10 +306,10 @@ function appendStyles() {
                     head.appendChild(link); 
                 }
             }
-            else if(item['notmedia']){
+            else if(item['excludemedia']){
             	bodyOnReady((function(item,link){
             		return function(){
-			        	if(!mediaquery(item['notmedia'])){
+			        	if(!mediaquery(item['excludemedia'])){
 			        			head.appendChild(link);
 			        	}
 		        	};
@@ -432,7 +432,7 @@ function createScriptTag(item) {
     }
     else {
         for (var attr in item) {
-            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'notmedia') {
+            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia') {
             	script.setAttribute(attr, item[attr]);
             }    
         }
@@ -440,8 +440,8 @@ function createScriptTag(item) {
         if(item['media']){
         	applies = mediaquery(item['media']);
         }
-        if(item['notmedia']){
-        	applies = !mediaquery(item['notmedia']);
+        if(item['excludemedia']){
+        	applies = !mediaquery(item['excludemedia']);
         }
         if (item['iecondition']) {
                 applies = isIE(item['iecondition']);
