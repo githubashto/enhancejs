@@ -1,12 +1,12 @@
 @import url(http://fonts.googleapis.com/css?family=Cantarell:bold);
 @import url(http://fonts.googleapis.com/css?family=Vollkorn);
 
-body { font-size: 62.5%; color: #444; background: #0472BC;  }
+body { font-size: 62.5%; color: #444; background: #438900;  }
 h1 { margin: 10px auto; font-size: 7em;}
 
 a { color: #fff; }
 
-.enhanced_toggleResult { width: 600px; text-align: center; margin: 50px auto; padding-top: 20px; display: block; border-top: 1px solid #114472; }
+.enhanced_toggleResult { width: 600px; text-align: center; margin: 50px auto; padding-top: 20px; display: block; border-top: 1px solid #fff; }
 
 
 
@@ -14,9 +14,9 @@ a { color: #fff; }
 /*enhancejs-logo*/
 /* structure */
 .enhancejs-logo { position: relative; font-weight: normal; font-family: 'Cantarell:bold', 'Trebuchet MS', sans-serif; width: 5.2em; padding: .1em .3em .3em; overflow: hidden; -moz-border-radius: .05em; -webkit-border-radius: .05em; border-radius: .05em;  }
-.enhancejs-logo .logo-title { text-transform: lowercase; color: #fff; font-weight: bold; float: left;   }
+.enhancejs-logo .logo-title { text-transform: lowercase;  font-weight: bold; float: left;   }
 .enhancejs-logo .logo-title span { float: right; width: .9em; margin-left: .1em; vertical-align: baseline;    -moz-border-radius: .15em; -webkit-border-radius: .15em; border-radius: .15em; font-size: 1.1em; line-height: .6; margin-top: .3em; overflow: hidden; padding-bottom: .15em; font-family: 'Vollkorn', sans-serif;  text-shadow: none;}
 .enhancejs-logo .logo-tag {font-weight: bold; float: left;  clear: left; font-style: normal; font-size: .22em; margin: -.5em 0 0 .3em;}
 /*colors*/
-.enhancejs-logo { background: #0472BC; color: #fff; text-shadow: 0 0 .1em #114472; }
-.enhancejs-logo .logo-title span {  background: #fff;  color: #0472BC; -moz-box-shadow: 0px 0px .1em #114472; -webkit-box-shadow: 0px 0px .1em #114472; box-shadow: 0px 0px .1em #114472; }
+.enhancejs-logo { background: #438900; color: #fff; text-shadow: 0 0 .1em #1B3800; }
+.enhancejs-logo .logo-title span {  background: #fff;  color: #438900; -moz-box-shadow: 0px 0px .1em #1B3800; -webkit-box-shadow: 0px 0px .1em #1B3800; box-shadow: 0px 0px .1em #1B3800; }
