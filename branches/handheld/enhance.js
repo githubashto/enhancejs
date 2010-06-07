@@ -275,8 +275,8 @@ function enhancePage() {
     	for(var item in arr){
     		//still false and arr item is an obj
     		if(!needsJSMediaQueries && typeof arr[item] !== 'string'){
-    			//both ex and media use doc.body
-    			needsJSMediaQueries = (!!arr[item]['excludemedia'] || !!arr[item]['media']);
+    			//both exmedia and loadScripts media/exmedia use doc.body
+    			needsJSMediaQueries = !!arr[item]['excludemedia'] || (arr === loadScripts && !!arr[item]['media']);
     		}
     	}
     	return needsJSMediaQueries;
@@ -340,14 +340,14 @@ function appendStyles() {
         }
         else {
             for (var attr in item) {
-                if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia') {
+            	if(attr === 'media'){
+            		link.setAttribute(attr, switchmedia(item[attr]));
+            	}
+                else if(attr !== 'iecondition' && attr !== 'excludemedia') {
                     link.setAttribute(attr, item[attr]);
                 }    
             }
             var applies = true;
-            if(item['media']){
-            	applies = mediaquery(item['media']);
-	        }
             if(item['excludemedia']){
             	applies = !mediaquery(item['excludemedia']);
 	        }
@@ -388,16 +388,22 @@ var isIE = (function() {
 	}	
 })();
 
+//media switch
+function switchmedia(q){
+	if(toggledMedia[0] && toggledMedia[1]){
+		if(q == toggledMedia[0]){ q = toggledMedia[1]; }
+		if(q == toggledMedia[1]){ q = toggledMedia[0]; }
+	}
+	return q;
+}
+
 
 //test whether a media query applies
 var mediaquery = (function(){
 	var cache = {};
 	return function(q){
-		//check if any media types should be toggled
-		if(toggledMedia[0] && toggledMedia[1]){
-			if(q == toggledMedia[0]){ q = toggledMedia[1]; }
-			if(q == toggledMedia[1]){ q = toggledMedia[0]; }
-		}
+		//check if media type should be toggled
+		q = switchmedia(q);
 		if (cache[q] === undefined) {
 			var testDiv = doc.createElement('div');
 			testDiv.setAttribute('id','ejs-qtest');
