@@ -140,12 +140,7 @@ enhance.defaultSettings = {
 };
 
 function cookiesSupported(){
-	if(!!!doc.cookie){ return false; }
-	var testCookie = 'enhancejs-cookietest';
-	createCookie(testCookie, 'enabled');
-	var result = readCookie(testCookie);
-	eraseCookie(testCookie);
-	return result === 'enabled';
+	return !!doc.cookie;
 }
 enhance.cookiesSupported = cookiesSupported();
 
