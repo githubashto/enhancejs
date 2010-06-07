@@ -16,28 +16,23 @@ else{ head = docElem; }
 win.enhance = function(options) {
     options  = options || {};
     settings = {};
-    
     // mixin settings
     for (var name in enhance.defaultSettings) {
         var option = options[name];
         settings[name] = option !== undefined ? option : enhance.defaultSettings[name];
     }
-    
     // mixin additional tests
     for (var test in options.addTests) {
         settings.tests[test] = options.addTests[test];
     }
-    
     //add testName class immediately for FOUC prevention, remove later on fail
     if (docElem.className.indexOf(settings.testName) === -1) {
         docElem.className += ' ' + settings.testName;
     }
-    
     //cookie names for toggled media types
     mediaCookieA = settings.testName + '-toggledmediaA';
 	mediaCookieB = settings.testName + '-toggledmediaB';
 	toggledMedia = [readCookie(mediaCookieA), readCookie(mediaCookieB)];
-    
     //fallback for removing testName class
     setTimeout(function(){ if(!testPass){ removeHTMLClass(); } }, 3000);
 
@@ -45,9 +40,7 @@ win.enhance = function(options) {
     
     applyDocReadyHack();
     
-    windowLoad(function() { 
-    	windowLoaded = true; 
-    });
+    windowLoad(function() { windowLoaded = true; });
 };
 
 enhance.defaultTests = {
@@ -176,7 +169,6 @@ if(enhance.cookiesSupported){ enhance.reTest = reTest; }
 
 function runTests() {
     var result = readCookie(settings.testName);
-        
     //check for cookies from a previous test
     if (result) {
         if (result === 'pass') {
@@ -207,7 +199,6 @@ function runTests() {
                     break;
                 }
             }
-            
             result = pass ? 'pass' : 'fail';
             createCookie(settings.testName, result);
             if (pass) {
@@ -281,7 +272,6 @@ function enhancePage() {
     	}
     	return needsJSMediaQueries;
 	}
-	
     if (settings.loadStyles.length) {
     	if(needsJSMediaQueries(settings.loadStyles)){
     		bodyOnReady(appendStyles);
@@ -327,7 +317,6 @@ function addIncompleteClass (){
 function appendStyles() {
     var index = -1,
         item;
-    
     while ((item = settings.loadStyles[++index])) {
         var link  = doc.createElement('link');
         link.type = 'text/css';
@@ -364,7 +353,6 @@ function appendStyles() {
 var isIE = (function() {
 	var cache = {},
 		b;
-    	
     return function(condition) {	
     	if(/*@cc_on!@*/true){return false;}
 		var cc = 'IE';
@@ -378,7 +366,6 @@ var isIE = (function() {
 				}
 			}
 		}
-		
 		if (cache[cc] === undefined) {
 			b = b || doc.createElement('B');
 			b.innerHTML = '<!--[if '+ cc +']><b></b><![endif]-->';
@@ -396,7 +383,6 @@ function switchmedia(q){
 	}
 	return q;
 }
-
 
 //test whether a media query applies
 var mediaquery = (function(){
@@ -423,7 +409,6 @@ var mediaquery = (function(){
 		return cache[q];
 	}
 })();
-
 enhance.query = mediaquery;
 
 function appendScripts(){
@@ -432,12 +417,10 @@ function appendScripts(){
 
 function appendScriptsSync() {
     var queue = [].concat(settings.loadScripts);
-    
     function next() {
         if (queue.length === 0) {
             return false;
         }
-        
         var item    = queue.shift(),
             script = createScriptTag(item),
             done   = false;
@@ -457,14 +440,12 @@ function appendScriptsSync() {
         	return next();
         }
     }
-    
     next();
 }
 
 function appendScriptsAsync() {
     var index = -1,
         item;
-        
     while ((item = settings.loadScripts[++index])) {
     	var script = createScriptTag(item);
         if(script){
@@ -478,7 +459,6 @@ function createScriptTag(item) {
     var script  = doc.createElement('script');
     script.type = 'text/javascript';
     script.onerror = settings.onLoadError;
-    
     if (typeof item === 'string') {
         script.src  = item;
         return script;
@@ -526,7 +506,6 @@ function readCookie(name) {
 function eraseCookie(name) {
     createCookie(name,"",-1);
 }
-							
 
 function applyDocReadyHack() {
     // via http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
@@ -546,7 +525,5 @@ function applyDocReadyHack() {
         // it does not really matter for this purpose
         doc.readyState = "loading";
 	}
-}
-		
-		
+}		
 })(window, document);
