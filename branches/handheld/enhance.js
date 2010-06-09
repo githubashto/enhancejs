@@ -8,7 +8,8 @@
 var settings, body, windowLoaded, head, 
 	docElem = doc.documentElement,
 	testPass = false,
-	mediaCookieA, mediaCookieB, toggledMedia;
+	mediaCookieA, mediaCookieB, 
+	toggledMedia = [];
 	
 if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || docElem; }
 else{ head = docElem; }
@@ -302,6 +303,15 @@ function toggleMedia(mediaA,mediaB){
 }
 enhance.toggleMedia = toggleMedia;
 
+//return a toggled media type/query
+function mediaSwitch(q){
+	if(toggledMedia.length == 2){
+		if(q == toggledMedia[0]){ q = toggledMedia[1]; }
+		else if(q == toggledMedia[1]){ q = toggledMedia[0]; }
+	}
+	return q;
+}
+
 function addIncompleteClass (){
 	var errorClass = settings.testName + '-incomplete';
 	if (docElem.className.indexOf(errorClass) === -1) {
@@ -323,14 +333,17 @@ function appendStyles() {
             head.appendChild(link);
         }
         else {
+        	if(item['media']){ item['media'] = mediaSwitch(item['media']); }
+        	if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
+        	
             for (var attr in item) {
-                if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia') {
+                if (attr !== 'iecondition' && attr !== 'excludemedia') {
                     link.setAttribute(attr, item[attr]);
                 }    
             }
             var applies = true;
-            if(item['media']){
-            	applies = mediaquery(item['media']);
+            if(item['media'] && item['media'] !== 'print' && item['media'] !== 'projection' && item['media'] !== 'speech' && item['media'] !== 'aural' && item['media'] !== 'braille'){
+	        	applies = mediaquery(item['media']);
 	        }
             if(item['excludemedia']){
             	applies = !mediaquery(item['excludemedia']);
@@ -375,10 +388,6 @@ var mediaquery = (function(){
 	var cache = {};
 	return function(q){
 		//check if any media types should be toggled
-		if(toggledMedia[0] && toggledMedia[1]){
-			if(q == toggledMedia[0]){ q = toggledMedia[1]; }
-			else if(q == toggledMedia[1]){ q = toggledMedia[0]; }
-		}
 		if (cache[q] === undefined) {
 			var testDiv = doc.createElement('div');
 			testDiv.setAttribute('id','ejs-qtest');
@@ -453,6 +462,9 @@ function createScriptTag(item) {
         return script;
     }
     else {
+    	if(item['media']){ item['media'] = mediaSwitch(item['media']); }
+        if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
+        	
         for (var attr in item) {
             if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia') {
             	script.setAttribute(attr, item[attr]);
