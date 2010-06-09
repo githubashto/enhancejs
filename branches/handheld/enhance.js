@@ -377,7 +377,7 @@ var mediaquery = (function(){
 		//check if any media types should be toggled
 		if(toggledMedia[0] && toggledMedia[1]){
 			if(q == toggledMedia[0]){ q = toggledMedia[1]; }
-			if(q == toggledMedia[1]){ q = toggledMedia[0]; }
+			else if(q == toggledMedia[1]){ q = toggledMedia[0]; }
 		}
 		if (cache[q] === undefined) {
 			var testDiv = doc.createElement('div');
