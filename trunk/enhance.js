@@ -7,7 +7,9 @@
 (function(win, doc, undefined) {
 var settings, body, windowLoaded, head, 
 	docElem = doc.documentElement,
-	testPass = false;
+	testPass = false,
+	mediaCookieA, mediaCookieB, 
+	toggledMedia = [];
 	
 if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || docElem; }
 else{ head = docElem; }
@@ -15,23 +17,23 @@ else{ head = docElem; }
 win.enhance = function(options) {
     options  = options || {};
     settings = {};
-    
     // mixin settings
     for (var name in enhance.defaultSettings) {
         var option = options[name];
         settings[name] = option !== undefined ? option : enhance.defaultSettings[name];
     }
-    
     // mixin additional tests
     for (var test in options.addTests) {
         settings.tests[test] = options.addTests[test];
     }
-    
     //add testName class immediately for FOUC prevention, remove later on fail
     if (docElem.className.indexOf(settings.testName) === -1) {
         docElem.className += ' ' + settings.testName;
     }
-    
+    //cookie names for toggled media types
+    mediaCookieA = settings.testName + '-toggledmediaA';
+	mediaCookieB = settings.testName + '-toggledmediaB';
+	toggledMedia = [readCookie(mediaCookieA), readCookie(mediaCookieB)];
     //fallback for removing testName class
     setTimeout(function(){ if(!testPass){ removeHTMLClass(); } }, 3000);
 
@@ -39,9 +41,7 @@ win.enhance = function(options) {
     
     applyDocReadyHack();
     
-    windowLoad(function() { 
-    	windowLoaded = true; 
-    });
+    windowLoad(function() { windowLoaded = true; });
 };
 
 enhance.defaultTests = {
@@ -141,12 +141,7 @@ enhance.defaultSettings = {
 };
 
 function cookiesSupported(){
-	if(!!!doc.cookie){ return false; }
-	var testCookie = 'enhancejs-cookietest';
-	createCookie(testCookie, 'enabled');
-	var result = readCookie(testCookie);
-	eraseCookie(testCookie);
-	return result === 'enabled';
+	return !!doc.cookie;
 }
 enhance.cookiesSupported = cookiesSupported();
 
@@ -170,7 +165,6 @@ if(enhance.cookiesSupported){ enhance.reTest = reTest; }
 
 function runTests() {
     var result = readCookie(settings.testName);
-        
     //check for cookies from a previous test
     if (result) {
         if (result === 'pass') {
@@ -201,7 +195,6 @@ function runTests() {
                     break;
                 }
             }
-            
             result = pass ? 'pass' : 'fail';
             createCookie(settings.testName, result);
             if (pass) {
@@ -263,15 +256,60 @@ function removeHTMLClass(){
 
 function enhancePage() {
 	testPass = true;
+	//check if loadscripts/loadstyles contain js-dependent mediaqueries (if so, wait for doc.body)
+	function needsJSMediaQueries(arr){
+		var needsJSMediaQueries = false;
+    	for(var item in arr){
+    		//still false and arr item is an obj
+    		if(!needsJSMediaQueries && typeof arr[item] !== 'string'){
+    			//both ex and media use doc.body
+    			needsJSMediaQueries = (!!arr[item]['excludemedia'] || !!arr[item]['media']);
+    		}
+    	}
+    	return needsJSMediaQueries;
+	}
     if (settings.loadStyles.length) {
-        appendStyles();
+    	if(needsJSMediaQueries(settings.loadStyles)){
+    		bodyOnReady(appendStyles);
+    	}
+    	else{
+    		appendStyles();
+    	}
     }
     if (settings.loadScripts.length) {
-        settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
+    	if(needsJSMediaQueries(settings.loadScripts)){
+    		bodyOnReady(appendScripts);
+    	}
+    	else{
+    		appendScripts();
+    	}        
     }
     else{
     	settings.onScriptsLoaded();
     }
+}
+
+//media toggling methods and storage
+function toggleMedia(mediaA,mediaB){
+	if(readCookie(mediaCookieA) && readCookie(mediaCookieB)){
+		eraseCookie(mediaCookieA);
+		eraseCookie(mediaCookieB);
+	}
+	else{
+		createCookie(mediaCookieA, mediaA);
+		createCookie(mediaCookieB, mediaB);
+	}
+	win.location.reload();
+}
+enhance.toggleMedia = toggleMedia;
+
+//return a toggled media type/query
+function mediaSwitch(q){
+	if(toggledMedia.length == 2){
+		if(q == toggledMedia[0]){ q = toggledMedia[1]; }
+		else if(q == toggledMedia[1]){ q = toggledMedia[0]; }
+	}
+	return q;
 }
 
 function addIncompleteClass (){
@@ -284,7 +322,6 @@ function addIncompleteClass (){
 function appendStyles() {
     var index = -1,
         item;
-    
     while ((item = settings.loadStyles[++index])) {
         var link  = doc.createElement('link');
         link.type = 'text/css';
@@ -296,22 +333,27 @@ function appendStyles() {
             head.appendChild(link);
         }
         else {
+        	if(item['media']){ item['media'] = mediaSwitch(item['media']); }
+        	if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
+        	
             for (var attr in item) {
-                if (attr !== 'iecondition') {
+                if (attr !== 'iecondition' && attr !== 'excludemedia') {
                     link.setAttribute(attr, item[attr]);
                 }    
             }
-            if (item['iecondition']) {
-                if (isIE(item['iecondition'])) {
-                    head.appendChild(link); 
-                }
-                else{
-                	return false;
-                }
+            var applies = true;
+            if(item['media'] && item['media'] !== 'print' && item['media'] !== 'projection' && item['media'] !== 'speech' && item['media'] !== 'aural' && item['media'] !== 'braille'){
+	        	applies = mediaquery(item['media']);
+	        }
+            if(item['excludemedia']){
+            	applies = !mediaquery(item['excludemedia']);
+	        }
+	        if (item['iecondition']) {
+                applies = isIE(item['iecondition']);
             }
-            else {
-                head.appendChild(link);
-            }
+	        if(applies){ 
+	        	head.appendChild(link); 
+	        }
         }
     }
 }
@@ -319,7 +361,6 @@ function appendStyles() {
 var isIE = (function() {
 	var cache = {},
 		b;
-    	
     return function(condition) {	
     	if(/*@cc_on!@*/true){return false;}
 		var cc = 'IE';
@@ -333,7 +374,6 @@ var isIE = (function() {
 				}
 			}
 		}
-		
 		if (cache[cc] === undefined) {
 			b = b || doc.createElement('B');
 			b.innerHTML = '<!--[if '+ cc +']><b></b><![endif]-->';
@@ -343,14 +383,42 @@ var isIE = (function() {
 	}	
 })();
 
+//test whether a media query applies
+var mediaquery = (function(){
+	var cache = {};
+	return function(q){
+		//check if any media types should be toggled
+		if (cache[q] === undefined) {
+			var testDiv = doc.createElement('div');
+			testDiv.setAttribute('id','ejs-qtest');
+			var styleBlock = doc.createElement('style');
+			styleBlock.type = "text/css";
+			/*set inner css text. credit: http://www.phpied.com/dynamic-script-and-style-elements-in-ie/*/
+			var cssrule = '@media '+q+' { #ejs-qtest { position: absolute; width: 10px; } }';
+			if (styleBlock.styleSheet){ styleBlock.styleSheet.cssText = cssrule; }
+			else { styleBlock.appendChild(doc.createTextNode(cssrule)); }     
+			head.appendChild(styleBlock);
+			doc.body.appendChild(testDiv);
+			var divWidth = testDiv.offsetWidth;
+			doc.body.removeChild(testDiv);
+			head.removeChild(styleBlock);
+			cache[q] = (divWidth == 10);
+		}
+		return cache[q];
+	}
+})();
+enhance.query = mediaquery;
+
+function appendScripts(){
+	settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
+}
+
 function appendScriptsSync() {
     var queue = [].concat(settings.loadScripts);
-    
     function next() {
         if (queue.length === 0) {
             return false;
         }
-        
         var item    = queue.shift(),
             script = createScriptTag(item),
             done   = false;
@@ -370,14 +438,12 @@ function appendScriptsSync() {
         	return next();
         }
     }
-    
     next();
 }
 
 function appendScriptsAsync() {
     var index = -1,
         item;
-        
     while ((item = settings.loadScripts[++index])) {
     	var script = createScriptTag(item);
         if(script){
@@ -391,28 +457,30 @@ function createScriptTag(item) {
     var script  = doc.createElement('script');
     script.type = 'text/javascript';
     script.onerror = settings.onLoadError;
-    
     if (typeof item === 'string') {
         script.src  = item;
         return script;
     }
     else {
+    	if(item['media']){ item['media'] = mediaSwitch(item['media']); }
+        if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
+        	
         for (var attr in item) {
-            if (attr !== 'iecondition') {
-                script.setAttribute(attr, item[attr]);
+            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia') {
+            	script.setAttribute(attr, item[attr]);
             }    
         }
+        var applies = true;
+        if(item['media']){
+        	applies = mediaquery(item['media']);
+        }
+        if(item['excludemedia']){
+        	applies = !mediaquery(item['excludemedia']);
+        }
         if (item['iecondition']) {
-            if (isIE(item['iecondition'])) {
-                return script;
-            }
-            else {
-            	return false;
-            }
+                applies = isIE(item['iecondition']);
         }
-        else {
-            return script;
-        }
+        return applies ? script : false;
     }
 }
 
@@ -439,7 +507,6 @@ function readCookie(name) {
 function eraseCookie(name) {
     createCookie(name,"",-1);
 }
-							
 
 function applyDocReadyHack() {
     // via http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
@@ -459,7 +526,5 @@ function applyDocReadyHack() {
         // it does not really matter for this purpose
         doc.readyState = "loading";
 	}
-}
-		
-		
+}		
 })(window, document);
