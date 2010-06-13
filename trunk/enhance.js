@@ -5,7 +5,7 @@
  * Licensed under MIT (license.txt)
 */
 (function(win, doc, undefined) {
-var settings, body, windowLoaded, head, 
+var settings, body, fakeBody, windowLoaded, head, 
 	docElem = doc.documentElement,
 	testPass = false,
 	mediaCookieA, mediaCookieB, 
@@ -163,6 +163,16 @@ function reTest() {
 }
 if(enhance.cookiesSupported){ enhance.reTest = reTest; }
 
+function addFakeBody(){
+	fakeBody = doc.createElement('body'); 
+	docElem.insertBefore(fakeBody, docElem.firstChild);
+	body = fakeBody;
+}
+function removeFakeBody(){
+	docElem.removeChild(fakeBody);
+	body = doc.body;
+}
+
 function runTests() {
     var result = readCookie(settings.testName);
     //check for cookies from a previous test
@@ -184,44 +194,33 @@ function runTests() {
     }
     //no cookies - run tests
     else {
-        bodyOnReady(function() {
-            var pass = true;
-            for (var name in settings.tests) {
-                pass = settings.tests[name]();
-                if (!pass) {
-                    if (settings.alertOnFailure) {
-                        alert(name + ' failed');
-                    }
-                    break;
+        var pass = true;
+        addFakeBody();
+        for (var name in settings.tests) {
+            pass = settings.tests[name]();
+            if (!pass) {
+                if (settings.alertOnFailure) {
+                    alert(name + ' failed');
                 }
+                break;
             }
-            result = pass ? 'pass' : 'fail';
-            createCookie(settings.testName, result);
-            if (pass) {
-                enhancePage();
-                settings.onPass();
-            }
-            else {
-                settings.onFail();
-                removeHTMLClass();
-            }
-                        
-            if (settings.appendToggleLink) {
-                windowLoad(function() { 
-                    appendToggleLinks(result);
-                });
-            }
-        });
-    }
-}
-
-function bodyOnReady(callback) {
-    var checkBody = setInterval(bodyReady, 1);
-    function bodyReady() {
-        if (doc.body) {
-            body = doc.body;
-            clearInterval(checkBody);
-            callback();
+        }
+        removeFakeBody();
+        result = pass ? 'pass' : 'fail';
+        createCookie(settings.testName, result);
+        if (pass) {
+            enhancePage();
+            settings.onPass();
+        }
+        else {
+            settings.onFail();
+            removeHTMLClass();
+        }
+                    
+        if (settings.appendToggleLink) {
+            windowLoad(function() { 
+                appendToggleLinks(result);
+            });
         }
     }
 }
@@ -256,33 +255,11 @@ function removeHTMLClass(){
 
 function enhancePage() {
 	testPass = true;
-	//check if loadscripts/loadstyles contain js-dependent mediaqueries (if so, wait for doc.body)
-	function needsJSMediaQueries(arr){
-		var needsJSMediaQueries = false;
-    	for(var item in arr){
-    		//still false and arr item is an obj
-    		if(!needsJSMediaQueries && typeof arr[item] !== 'string'){
-    			//both ex and media use doc.body
-    			needsJSMediaQueries = (!!arr[item]['excludemedia'] || !!arr[item]['media']);
-    		}
-    	}
-    	return needsJSMediaQueries;
-	}
     if (settings.loadStyles.length) {
-    	if(needsJSMediaQueries(settings.loadStyles)){
-    		bodyOnReady(appendStyles);
-    	}
-    	else{
-    		appendStyles();
-    	}
+    	appendStyles();
     }
     if (settings.loadScripts.length) {
-    	if(needsJSMediaQueries(settings.loadScripts)){
-    		bodyOnReady(appendScripts);
-    	}
-    	else{
-    		appendScripts();
-    	}        
+    	appendScripts();        
     }
     else{
     	settings.onScriptsLoaded();
@@ -385,12 +362,14 @@ var isIE = (function() {
 
 //test whether a media query applies
 var mediaquery = (function(){
-	var cache = {};
+	var cache = {},
+		testDiv = doc.createElement('div');
+	
+	testDiv.setAttribute('id','ejs-qtest');
 	return function(q){
 		//check if any media types should be toggled
 		if (cache[q] === undefined) {
-			var testDiv = doc.createElement('div');
-			testDiv.setAttribute('id','ejs-qtest');
+			addFakeBody();
 			var styleBlock = doc.createElement('style');
 			styleBlock.type = "text/css";
 			/*set inner css text. credit: http://www.phpied.com/dynamic-script-and-style-elements-in-ie/*/
@@ -398,10 +377,11 @@ var mediaquery = (function(){
 			if (styleBlock.styleSheet){ styleBlock.styleSheet.cssText = cssrule; }
 			else { styleBlock.appendChild(doc.createTextNode(cssrule)); }     
 			head.appendChild(styleBlock);
-			doc.body.appendChild(testDiv);
+			body.appendChild(testDiv);
 			var divWidth = testDiv.offsetWidth;
-			doc.body.removeChild(testDiv);
+			body.removeChild(testDiv);
 			head.removeChild(styleBlock);
+			removeFakeBody();
 			cache[q] = (divWidth == 10);
 		}
 		return cache[q];
