@@ -225,17 +225,6 @@ function runTests() {
     }
 }
 
-function bodyOnReady(callback) {
-    var checkBody = setInterval(bodyReady, 1);
-    function bodyReady() {
-        if (doc.body) {
-            body = doc.body;
-            clearInterval(checkBody);
-            callback();
-        }
-    }
-}
-
 function windowLoad(callback) {
     if (windowLoaded) {
         callback();
