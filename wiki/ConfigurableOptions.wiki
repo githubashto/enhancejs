@@ -169,7 +169,7 @@ All these properties are available in loading stylesheets through the loadStyles
   * default: false
 
 	
-=Methods=
+=External Properties and Methods=
 
 After running the test, you can call several methods on the enhance object. 
 
@@ -179,7 +179,34 @@ After running the test, you can call several methods on the enhance object.
 	enhance.forceFail();
 }}}	
 	
-The following methods can be called post-test:
+The following methods and properties can be used post-test:
+===mediaquery===
+  * type: function
+  * description: run your own media query tests to see if a particular media type or query will apply before relying on it.
+  * example code:
+{{{
+//check if the browser displays the screen media type
+enhance.mediaquery('screen');
+//returns true/false
+
+//check if the browser displays the common mobile webkit media query
+enhance.mediaquery('screen and (max-device-width: 480px)');
+//returns true/false
+}}}
+
+
+===cookiesSupported===
+  * type: boolean
+  * description: allows you to detect whether cookies are enabled/supported. The methods forceFail,forcePass, reTest, and toggleMedia should never be relied upon without checking that this property is true first.
+
+===toggleMedia===
+  * type: function
+  * description: allows you to toggle all occurrences of 2 media types and refresh the page. This allows you to create a link that toggles between screen and handheld experiences, for example.
+  * example code:
+{{{
+//switch experiences between screen and handheld
+enhance.toggleMedia('screen', 'screen and (max-device-width: 480px)');
+}}}
 
 ===forceFail===
   * type: function
@@ -192,5 +219,7 @@ The following methods can be called post-test:
 ===reTest===
   * type: function
   * description: Delete cookie and refresh page (re-run test)
+
+
 	
 	
