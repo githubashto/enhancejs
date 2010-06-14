@@ -1,4 +1,5 @@
 #summary How to include and run EnhanceJS in your web pages
+#labels Featured
 =Basic Usage=
 
 1. To use enhance.js, first attach the script to your page:
