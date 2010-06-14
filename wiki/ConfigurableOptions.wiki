@@ -1,48 +1,112 @@
 #summary Documentation of all available options in EnhanceJS
+#labels Featured
 
 =Configurable Options=
 
-The following options are available for configuration:
-
-===testName===
-  * type: string
-  * description: If test passes, this string is added as a class to the html element, which is helpful for CSS scoping. It is also used as the name of the cookie which saves the test result for subsequent page loads.
-  * default: 'enhanced'
-	
-===loadScripts===
-  * type: array of strings
-  * description: JavaScript file urls to load. Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. Accepted values work like conditional comments in ie: 'IE 7', 'IE 6', 'lte IE 7', etc, or you can specify "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
-  * default: []
-  * example: 
-{{{
-enhance({
-   loadScripts: [
-      'a.css',
-      'b.css',
-      {'src': 'ie.css', 'iecondition': 'lte IE 7'}
-   ]
-});
-}}}
+The following options are available for configuration when calling EnhanceJS:
 	
 ===loadStyles===
   * type: array of strings or objects
-  * description: CSS file urls to load. Each array item can also be an object with attribute/value pairs, for setting attributes on the link element such as media types. Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. Accepted values work like conditional comments in ie: 'IE 7', 'IE 6', 'lte IE 7', etc, or you can specify "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
+  * description: CSS file urls to load (any css path will work, local or remote, relative to the HTML page enhance is running in).  
   * default: []
   * example: 
 {{{
 enhance({
    loadStyles: [
-      'a.js',
-      'b.js',
-      {'src': 'ie.js', 'iecondition': 'lte IE 7'}
+      'a.css',
+      'b.css'
    ]
 });
 }}}
+
+ * Using the object syntax specifying each stylesheet in object literal syntax, you can manually set attributes on the generated link tags, like the type,media, rel (for alternate stylesheets), etc. The example above shown in this syntax:
+{{{
+enhance({
+   loadStyles: [
+     {href:  'a.css'},
+     {href:  'b.css'}
+   ]
+});
+}}}
+ * Targeting media types and queries with media and excludemedia: These properties accept CSS media types and media queries where the stylesheet should or should not be loaded. The following demonstrates stylesheets directed to either screen or mobile.
+{{{
+enhance({
+   loadStyles: [
+     {media: 'screen', excludemedia: 'screen and (max-device-width: 480px)', href: 'js/screen.css'},
+     {media: 'screen and (max-device-width: 480px)', href: 'js/handheld.css'}
+   ]
+});
+}}}
+
+ * iecondition property. Optionally, you can specify an 'iecondition' property as well, to direct stylesheets to specific versions of Internet Explorer. Accepted values work like conditional comments in ie: 'IE 7', 'IE 6', 'lte IE 7', etc, or you can specify "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
+
+{{{
+enhance({
+   loadStyles: [
+      'a.css',
+      'b.css',
+      {src: 'ie.css', iecondition: 'lte IE 7'}
+   ]
+});
+}}}
+
+All these properties are available in loading script files through the loadScripts array as well.
+
+===loadScripts===
+  * type: array of strings
+  * description: JavaScript file urls to load. 
+  * default: []
+  * example: 
+{{{
+enhance({
+   loadScripts: [
+      'a.js',
+      'b.js'
+   ]
+});
+}}}
+ * Using the object syntax specifying each script in object literal syntax, you can manually set attributes on the generated script tags, like the type, title, etc. The example above shown in this syntax:
+{{{
+enhance({
+   loadScripts: [
+     {src:  'a.js'},
+     {src:  'b.js'}
+   ]
+});
+}}}
+ * Targeting media types and queries with media and excludemedia: These properties accept CSS media types and media queries where the script should or should not be loaded. The following demonstrates scripts directed to either screen or mobile.
+{{{
+enhance({
+   loadScripts: [
+     {media: 'screen', excludemedia: 'screen and (max-device-width: 480px)', src: 'js/screen.js'},
+     {media: 'screen and (max-device-width: 480px)', src: 'js/handheld.js'}
+   ]
+});
+}}}
+
+ * iecondition option. Optionally, you can specify an 'iecondition' property in the object as well, to direct stylesheets to specific versions of Internet Explorer. Accepted values work like conditional comments in ie: 'IE 7', 'IE 6', 'lte IE 7', etc, or you can specify "all" or a whole number, such as 6, 7, or 8. (note that versions older than 6 will not pass the default test suite)
+
+{{{
+enhance({
+   loadScripts: [
+      'a.js',
+      'b.js',
+      {src: 'ie.js', iecondition: 'lte IE 7'}
+   ]
+});
+}}}
+
+All these properties are available in loading stylesheets through the loadStyles array as well.
 
 ===queueLoading===
   * type: boolean
   * description: If true, JavaScript files in the loadScripts array are loaded consecutively to safeguard dependencies
   * default: true
+
+===onScriptsLoaded===
+  * type: callback function
+  * description: callback that executes when all loadScripts scripts have finished loading
+  * default: empty function
 	
 ===appendToggleLink===
   * type: boolean
@@ -89,15 +153,20 @@ enhance({
     * resize: Tests for window resize support
     * print: Tests for window print support
 
+===addTests===
+  * type: object
+  * description: Allows you to add tests on top of existing tests suite. Hash of key/value test methods and properties. 
+  * default: {}
+
+===testName===
+  * type: string
+  * description: If test passes, this string is added as a class to the html element, which is helpful for CSS scoping. It is also used as the name of the cookie which saves the test result for subsequent page loads.
+  * default: 'enhanced'
+
 ===alertOnFailure===
   * type: boolean
   * description: For development only. Alert failed test result. (uses alert() for wide compatibility)
   * default: false
-	
-===onScriptsLoaded===
-  * type: callback function
-  * description: callback that executes when all loadScripts scripts have finished loading
-  * default: empty function
 
 	
 =Methods=
