@@ -387,7 +387,7 @@ var mediaquery = (function(){
 		return cache[q];
 	}
 })();
-enhance.query = mediaquery;
+enhance.mediaquery = mediaquery;
 
 function appendScripts(){
 	settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
