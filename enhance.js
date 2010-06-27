@@ -1,5 +1,5 @@
 /*
- * EnhanceJS version 1.1 - Test-Driven Progressive Enhancement
+ * EnhanceJS version 1.0 - Test-Driven Progressive Enhancement
  * http://enhancejs.googlecode.com/
  * Copyright (c) 2010 Filament Group, Inc, authors.txt
  * Licensed under MIT (license.txt)
@@ -372,11 +372,11 @@ var mediaquery = (function(){
 			addFakeBody();
 			var styleBlock = doc.createElement('style');
 			styleBlock.type = "text/css";
+			head.appendChild(styleBlock);
 			/*set inner css text. credit: http://www.phpied.com/dynamic-script-and-style-elements-in-ie/*/
 			var cssrule = '@media '+q+' { #ejs-qtest { position: absolute; width: 10px; } }';
 			if (styleBlock.styleSheet){ styleBlock.styleSheet.cssText = cssrule; }
 			else { styleBlock.appendChild(doc.createTextNode(cssrule)); }     
-			head.appendChild(styleBlock);
 			body.appendChild(testDiv);
 			var divWidth = testDiv.offsetWidth;
 			body.removeChild(testDiv);
@@ -387,7 +387,7 @@ var mediaquery = (function(){
 		return cache[q];
 	}
 })();
-enhance.mediaquery = mediaquery;
+enhance.query = mediaquery;
 
 function appendScripts(){
 	settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
