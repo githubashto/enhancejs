@@ -374,7 +374,11 @@ var mediaquery = (function(){
 			styleBlock.type = "text/css";
 			/*set inner css text. credit: http://www.phpied.com/dynamic-script-and-style-elements-in-ie/*/
 			var cssrule = '@media '+q+' { #ejs-qtest { position: absolute; width: 10px; } }';
-			if (styleBlock.styleSheet){ styleBlock.styleSheet.cssText = cssrule; }
+			if (styleBlock.styleSheet){ 
+				if(styleBlock.styleSheet.cssText){
+					styleBlock.styleSheet.cssText = cssrule; 
+				}
+			}
 			else { styleBlock.appendChild(doc.createTextNode(cssrule)); }     
 			head.appendChild(styleBlock);
 			body.appendChild(testDiv);
