@@ -296,6 +296,19 @@ function addIncompleteClass (){
     }
 }
 
+function checkRequires(requires){
+	if(requires.constructor === Array){ 
+		var allGood = true;
+        for(var item in requires){
+        	if(allGood){ allGood = !!requires[item]; }
+        }   
+        return allGood;
+	}	
+	else {	
+		return !!requires;
+    }
+}
+
 function appendStyles() {
     var index = -1,
         item;
@@ -314,7 +327,7 @@ function appendStyles() {
         	if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
         	
             for (var attr in item) {
-                if (attr !== 'iecondition' && attr !== 'excludemedia') {
+                if (attr !== 'iecondition' && attr !== 'excludemedia' && attr !== 'requires') {
                     link.setAttribute(attr, item[attr]);
                 }    
             }
@@ -327,6 +340,9 @@ function appendStyles() {
 	        }
 	        if (item['iecondition']) {
                 applies = isIE(item['iecondition']);
+            }
+            if(item['requires'] !== undefined){
+            	applies = checkRequires(item['requires']);
             }
 	        if(applies){ 
 	        	head.appendChild(link); 
@@ -446,7 +462,7 @@ function createScriptTag(item) {
         if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
         	
         for (var attr in item) {
-            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia') {
+            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia' && attr !== 'requires') {
             	script.setAttribute(attr, item[attr]);
             }    
         }
@@ -459,6 +475,9 @@ function createScriptTag(item) {
         }
         if (item['iecondition']) {
                 applies = isIE(item['iecondition']);
+        }
+        if(item['requires'] !== undefined){
+        	applies = checkRequires(item['requires']);
         }
         return applies ? script : false;
     }
