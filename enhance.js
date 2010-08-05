@@ -335,13 +335,13 @@ function appendStyles() {
             if(item['media'] && item['media'] !== 'print' && item['media'] !== 'projection' && item['media'] !== 'speech' && item['media'] !== 'aural' && item['media'] !== 'braille'){
 	        	applies = mediaquery(item['media']);
 	        }
-            if(item['excludemedia']){
+            if(applies && item['excludemedia']){
             	applies = !mediaquery(item['excludemedia']);
 	        }
-	        if (item['iecondition']) {
+	        if (applies && item['iecondition']) {
                 applies = isIE(item['iecondition']);
             }
-            if(item['requires'] !== undefined){
+            if(applies && item['requires'] !== undefined){
             	applies = checkRequires(item['requires']);
             }
 	        if(applies){ 
@@ -470,13 +470,13 @@ function createScriptTag(item) {
         if(item['media']){
         	applies = mediaquery(item['media']);
         }
-        if(item['excludemedia']){
+        if(applies && item['excludemedia']){
         	applies = !mediaquery(item['excludemedia']);
         }
-        if (item['iecondition']) {
+        if (applies && item['iecondition']) {
                 applies = isIE(item['iecondition']);
         }
-        if(item['requires'] !== undefined){
+        if(applies && item['requires'] !== undefined){
         	applies = checkRequires(item['requires']);
         }
         return applies ? script : false;
