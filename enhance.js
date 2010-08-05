@@ -326,11 +326,6 @@ function appendStyles() {
         	if(item['media']){ item['media'] = mediaSwitch(item['media']); }
         	if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
         	
-            for (var attr in item) {
-                if (attr !== 'iecondition' && attr !== 'excludemedia' && attr !== 'requires') {
-                    link.setAttribute(attr, item[attr]);
-                }    
-            }
             var applies = true;
             if(item['media'] && item['media'] !== 'print' && item['media'] !== 'projection' && item['media'] !== 'speech' && item['media'] !== 'aural' && item['media'] !== 'braille'){
 	        	applies = mediaquery(item['media']);
@@ -344,8 +339,13 @@ function appendStyles() {
             if(applies && item['requires'] !== undefined){
             	applies = checkRequires(item['requires']);
             }
-	        if(applies){ 
-	        	head.appendChild(link); 
+	        if(applies){ 	        	
+	        	for (var attr in item) {
+	                if (attr !== 'iecondition' && attr !== 'excludemedia' && attr !== 'requires') {
+	                    link.setAttribute(attr, item[attr]);
+	                }    
+	            }
+	            head.appendChild(link); 
 	        }
         }
     }
@@ -461,11 +461,6 @@ function createScriptTag(item) {
     	if(item['media']){ item['media'] = mediaSwitch(item['media']); }
         if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
         	
-        for (var attr in item) {
-            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia' && attr !== 'requires') {
-            	script.setAttribute(attr, item[attr]);
-            }    
-        }
         var applies = true;
         if(item['media']){
         	applies = mediaquery(item['media']);
@@ -479,7 +474,18 @@ function createScriptTag(item) {
         if(applies && item['requires'] !== undefined){
         	applies = checkRequires(item['requires']);
         }
-        return applies ? script : false;
+        
+        if(applies){
+        	for (var attr in item) {
+            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia' && attr !== 'requires') {
+	            	script.setAttribute(attr, item[attr]);
+	            }    
+	        }
+	        return script;
+        }
+        else{
+        	return false;
+        }
     }
 }
 
