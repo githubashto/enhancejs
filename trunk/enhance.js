@@ -338,10 +338,14 @@ function appendStyles() {
             }
             if(applies && item['requires'] !== undefined){
             	applies = checkRequires(item['requires']);
+            	if(!applies && item['fallback'] !== undefined){
+					item['href'] = item['fallback'];
+					applies = true;
+				}
             }
 	        if(applies){ 	        	
 	        	for (var attr in item) {
-	                if (attr !== 'iecondition' && attr !== 'excludemedia' && attr !== 'requires') {
+	                if (attr !== 'iecondition' && attr !== 'excludemedia' && attr !== 'requires' && attr !== 'fallback') {
 	                    link.setAttribute(attr, item[attr]);
 	                }    
 	            }
@@ -473,11 +477,15 @@ function createScriptTag(item) {
         }
         if(applies && item['requires'] !== undefined){
         	applies = checkRequires(item['requires']);
+        	if(!applies && item['fallback'] !== undefined){
+				item['src'] = item['fallback'];
+				applies = true;
+			}
         }
         
         if(applies){
         	for (var attr in item) {
-            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia' && attr !== 'requires') {
+            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia' && attr !== 'requires' && attr !== 'fallback') {
 	            	script.setAttribute(attr, item[attr]);
 	            }    
 	        }
