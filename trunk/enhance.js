@@ -296,16 +296,16 @@ function addIncompleteClass (){
     }
 }
 
-function checkRequires(requires){
-	if(requires.constructor === Array){ 
+function checkifsupported(ifsupported){
+	if(ifsupported.constructor === Array){ 
 		var allGood = true;
-        for(var item in requires){
-        	if(allGood){ allGood = !!requires[item]; }
+        for(var item in ifsupported){
+        	if(allGood){ allGood = !!ifsupported[item]; }
         }   
         return allGood;
 	}	
 	else {	
-		return !!requires;
+		return !!ifsupported;
     }
 }
 
@@ -336,8 +336,8 @@ function appendStyles() {
 	        if (applies && item['iecondition']) {
                 applies = isIE(item['iecondition']);
             }
-            if(applies && item['requires'] !== undefined){
-            	applies = checkRequires(item['requires']);
+            if(applies && item['ifsupported'] !== undefined){
+            	applies = checkifsupported(item['ifsupported']);
             	if(!applies && item['fallback'] !== undefined){
 					item['href'] = item['fallback'];
 					applies = true;
@@ -345,7 +345,7 @@ function appendStyles() {
             }
 	        if(applies){ 	        	
 	        	for (var attr in item) {
-	                if (attr !== 'iecondition' && attr !== 'excludemedia' && attr !== 'requires' && attr !== 'fallback') {
+	                if (attr !== 'iecondition' && attr !== 'excludemedia' && attr !== 'ifsupported' && attr !== 'fallback') {
 	                    link.setAttribute(attr, item[attr]);
 	                }    
 	            }
@@ -475,8 +475,8 @@ function createScriptTag(item) {
         if (applies && item['iecondition']) {
                 applies = isIE(item['iecondition']);
         }
-        if(applies && item['requires'] !== undefined){
-        	applies = checkRequires(item['requires']);
+        if(applies && item['ifsupported'] !== undefined){
+        	applies = checkifsupported(item['ifsupported']);
         	if(!applies && item['fallback'] !== undefined){
 				item['src'] = item['fallback'];
 				applies = true;
@@ -485,7 +485,7 @@ function createScriptTag(item) {
         
         if(applies){
         	for (var attr in item) {
-            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia' && attr !== 'requires' && attr !== 'fallback') {
+            if (attr !== 'iecondition' && attr !== 'media' && attr !== 'excludemedia' && attr !== 'ifsupported' && attr !== 'fallback') {
 	            	script.setAttribute(attr, item[attr]);
 	            }    
 	        }
