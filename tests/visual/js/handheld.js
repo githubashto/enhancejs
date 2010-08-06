@@ -5,7 +5,7 @@ $(function(){
 	if(enhance.cookiesSupported){
 		$('<a href="#" class="mobiledesktoptoggle">View screen version</a>')
 			.click(function(){
-				enhance.toggleMedia('screen', 'screen and (max-device-width: 480px)');
+				enhance.toggleMedia('-ejs-desktop', '-ejs-handheld');
 			})
 			.appendTo('body');
 			
