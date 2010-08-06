@@ -14,6 +14,34 @@ var settings, body, fakeBody, windowLoaded, head,
 if(doc.getElementsByTagName){ head = doc.getElementsByTagName('head')[0] || docElem; }
 else{ head = docElem; }
 
+//test whether a media query applies
+var mediaquery = (function(){
+	var cache = {},
+		testDiv = doc.createElement('div');
+	
+	testDiv.setAttribute('id','ejs-qtest');
+	return function(q){
+		//check if any media types should be toggled
+		if (cache[q] === undefined) {
+			addFakeBody();
+			var styleBlock = doc.createElement('style');
+			styleBlock.type = "text/css";
+			head.appendChild(styleBlock);
+			/*set inner css text. credit: http://www.phpied.com/dynamic-script-and-style-elements-in-ie/*/
+			var cssrule = '@media '+q+' { #ejs-qtest { position: absolute; width: 10px; } }';
+			if (styleBlock.styleSheet){ styleBlock.styleSheet.cssText = cssrule; }
+			else { styleBlock.appendChild(doc.createTextNode(cssrule)); }     
+			body.appendChild(testDiv);
+			var divWidth = testDiv.offsetWidth;
+			body.removeChild(testDiv);
+			head.removeChild(styleBlock);
+			removeFakeBody();
+			cache[q] = (divWidth == 10);
+		}
+		return cache[q];
+	}
+})();
+
 win.enhance = function(options) {
     options  = options || {};
     settings = {};
@@ -43,6 +71,8 @@ win.enhance = function(options) {
     
     windowLoad(function() { windowLoaded = true; });
 };
+
+enhance.query = mediaquery;
 
 enhance.defaultTests = {
     getById: function() {
@@ -132,6 +162,10 @@ enhance.defaultSettings = {
     forcePassText: 'View high-bandwidth version',
     forceFailText: 'View low-bandwidth version',
     tests: enhance.defaultTests,
+    media: {
+    	'-ejs-desktop': enhance.query('screen and (max-device-width: 1024px)') ? 'not screen and (max-device-width: 1024px)' : 'screen',
+    	'-ejs-handheld': 'screen and (max-device-width: 1024px)'
+    },
     addTests: {},
     alertOnFailure: false,
     onPass: function(){},
@@ -323,7 +357,14 @@ function appendStyles() {
             head.appendChild(link);
         }
         else {
-        	if(item['media']){ item['media'] = mediaSwitch(item['media']); }
+        	if(item['media']){
+        		item['media'] = mediaSwitch(item['media']); 
+        		if(settings['media']){
+        			if(settings['media'][item['media']] !== undefined){
+        				item['media'] = settings['media'][item['media']];
+        			}
+        		} 
+        	}
         	if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
         	
             var applies = true;
@@ -380,35 +421,6 @@ var isIE = (function() {
 	}	
 })();
 
-//test whether a media query applies
-var mediaquery = (function(){
-	var cache = {},
-		testDiv = doc.createElement('div');
-	
-	testDiv.setAttribute('id','ejs-qtest');
-	return function(q){
-		//check if any media types should be toggled
-		if (cache[q] === undefined) {
-			addFakeBody();
-			var styleBlock = doc.createElement('style');
-			styleBlock.type = "text/css";
-			head.appendChild(styleBlock);
-			/*set inner css text. credit: http://www.phpied.com/dynamic-script-and-style-elements-in-ie/*/
-			var cssrule = '@media '+q+' { #ejs-qtest { position: absolute; width: 10px; } }';
-			if (styleBlock.styleSheet){ styleBlock.styleSheet.cssText = cssrule; }
-			else { styleBlock.appendChild(doc.createTextNode(cssrule)); }     
-			body.appendChild(testDiv);
-			var divWidth = testDiv.offsetWidth;
-			body.removeChild(testDiv);
-			head.removeChild(styleBlock);
-			removeFakeBody();
-			cache[q] = (divWidth == 10);
-		}
-		return cache[q];
-	}
-})();
-enhance.query = mediaquery;
-
 function appendScripts(){
 	settings.queueLoading ? appendScriptsSync() : appendScriptsAsync();
 }
@@ -462,7 +474,14 @@ function createScriptTag(item) {
         return script;
     }
     else {
-    	if(item['media']){ item['media'] = mediaSwitch(item['media']); }
+    	if(item['media']){ 
+    		item['media'] = mediaSwitch(item['media']); 
+    		if(settings['media']){
+    			if(settings['media'][item['media']]){
+    				item['media'] = settings['media'][item['media']];
+    			}
+    		}  
+    	}
         if(item['excludemedia']){ item['excludemedia'] = mediaSwitch(item['excludemedia']); }
         	
         var applies = true;
